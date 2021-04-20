@@ -4,5 +4,6 @@ import "github.com/gin-gonic/gin"
 
 func main() {
 	r := gin.Default()
-	r.Run() // Runs by default on :8080
+	// Use in production build: autotls.Run(r, "wish-api.bredbrains.tech")
+	r.Run()
 }
