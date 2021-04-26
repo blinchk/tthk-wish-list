@@ -11,6 +11,7 @@ func main() {
 	authAPI := router.Group("/auth")
 	authAPI.POST("/register", auth.Register)
 	database.Connect()
-	// Use in production build: autotls.Run(r, "wish-api.bredbrains.tech")
+	// Use in production build
+	// autotls.Run(r, "wish-api.bredbrains.tech")
 	router.Run()
 }

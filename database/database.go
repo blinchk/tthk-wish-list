@@ -6,7 +6,6 @@ import (
 	"github.com/bredbrains/tthk-wish-list/models"
 	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
-	"log"
 	"time"
 )
 
@@ -39,15 +38,10 @@ func Connect() {
 func RegisterUser(user models.User) error {
 	hash, err := HashPassword(user.Password)
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 	_, err = db.Exec("INSERT INTO users(username, first_name, last_name, hash_password, access_token) "+
 		"VALUES (?, ?, ?, ?, ?)",
 		user.Username, user.FirstName, user.LastName, hash, user.AccessToken)
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
 	return err
 }
