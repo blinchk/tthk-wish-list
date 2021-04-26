@@ -2,12 +2,15 @@ package main
 
 import (
 	"github.com/bredbrains/tthk-wish-list/database"
+	"github.com/bredbrains/tthk-wish-list/endpoints/auth"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	r := gin.Default()
+	router := gin.Default()
+	authAPI := router.Group("/auth")
+	authAPI.POST("/register", auth.Register)
 	database.Connect()
 	// Use in production build: autotls.Run(r, "wish-api.bredbrains.tech")
-	r.Run()
+	router.Run()
 }
