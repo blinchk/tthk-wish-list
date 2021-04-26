@@ -3,7 +3,6 @@ package database
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"log"
 	"time"
 
@@ -38,22 +37,16 @@ func Connect() {
 	db.SetMaxIdleConns(10)
 }
 
-func VerifyUser(user models.User) bool {
+func VerifyUser(user models.User) error {
 	row := db.QueryRow("SELECT hash_password FROM users WHERE username = ?", user.Username)
 	var hash_password string
-	switch err := row.Scan(&hash_password); err {
-	case sql.ErrNoRows:
-		fmt.Println("No rows were returned!")
-		return false
-	case nil:
-		fmt.Println(hash_password)
-		if CheckPasswordHash(user.Password, hash_password) {
-			return true
-		}
-	default:
-		panic(err)
+	var err error
+	err = row.Scan(&hash_password)
+	if err != nil {
+		log.Fatal(err)
+		return err
 	}
-	return false
+	return err
 }
 
 func RegisterUser(user models.User) error {
@@ -62,9 +55,9 @@ func RegisterUser(user models.User) error {
 		log.Fatal(err)
 		return err
 	}
-	_, err = db.Exec("INSERT INTO users(username, first_name, last_name, hash_password, access_token) "+
+	_, err = db.Exec("INSERT INTO users(username, first_name, last_name, hash_password, access_token, registration_time) "+
 		"VALUES (?, ?, ?, ?, ?)",
-		user.Username, user.FirstName, user.LastName, hash, user.AccessToken)
+		user.Username, user.FirstName, user.LastName, hash, user.AccessToken, time.Now().Format("2021-04-26 22:49:50"))
 	if err != nil {
 		log.Fatal(err)
 		return err
@@ -82,7 +75,25 @@ func AddWish(wish models.Wish) error {
 }
 
 func DeleteWish(wish models.Wish) error {
-	_, err := db.Exec("DELETE FROM wishes WHERE name = ? AND description = ?", wish.Name, wish.Description)
+	_, err := db.Exec("DELETE FROM wishes WHERE id = ?", wish.ID)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	return err
+}
+
+func EditWish(wish models.Wish) error {
+	_, err := db.Exec("UPDATE wishes SET name = ?, description = ? WHERE id = ?", wish.Name, wish.Description, wish.ID)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	return err
+}
+
+func HideWish(pool models.Pool) error {
+	_, err := db.Exec("UPDATE pool SET hidden = !hidden WHERE id = ?", pool.ID)
 	if err != nil {
 		log.Fatal(err)
 		return err
