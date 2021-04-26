@@ -3,11 +3,13 @@ package database
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"log"
+	"time"
+
 	"github.com/bredbrains/tthk-wish-list/models"
 	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
-	"log"
-	"time"
 )
 
 var (
@@ -34,6 +36,24 @@ func Connect() {
 	db.SetConnMaxLifetime(time.Minute * 3)
 	db.SetMaxOpenConns(10)
 	db.SetMaxIdleConns(10)
+}
+
+func VerifyUser(user models.User) bool {
+	row := db.QueryRow("SELECT hash_password FROM users WHERE username = ?", user.Username)
+	var hash_password string
+	switch err := row.Scan(&hash_password); err {
+	case sql.ErrNoRows:
+		fmt.Println("No rows were returned!")
+		return false
+	case nil:
+		fmt.Println(hash_password)
+		if CheckPasswordHash(user.Password, hash_password) {
+			return true
+		}
+	default:
+		panic(err)
+	}
+	return false
 }
 
 func RegisterUser(user models.User) error {

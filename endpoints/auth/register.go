@@ -1,12 +1,13 @@
 package auth
 
 import (
+	"net/http"
+	"os"
+
 	"github.com/bredbrains/tthk-wish-list/database"
 	"github.com/bredbrains/tthk-wish-list/models"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"os"
 )
 
 func Register(c *gin.Context) {
