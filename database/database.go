@@ -42,7 +42,8 @@ func RegisterUser(user models.User, db sql.DB) bool {
 		log.Fatal(err)
 		return false
 	}
-	_, err = db.ExecContext(ctx, "INSERT INTO users(username, hash_password, access_token) VALUES (?, ?, ?)", user.Username, hash)
+	_, err = db.ExecContext(ctx, "INSERT INTO users(username, firstName, lastName, hash_password, access_token) VALUES (?, ?, ?)",
+		user.Username, user.FirstName, user.LastName, hash)
 	if err != nil {
 		log.Fatal(err)
 		return false
