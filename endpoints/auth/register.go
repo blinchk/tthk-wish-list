@@ -31,7 +31,7 @@ func Register(c *gin.Context) {
 	}
 	err = database.RegisterUser(user)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		c.JSON(http.StatusConflict, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 	message := gin.H{"success": true, "access_token": user.AccessToken}
