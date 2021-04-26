@@ -36,11 +36,16 @@ func Connect() {
 	db.SetMaxIdleConns(10)
 }
 
-func RegisterUser(user models.User, db sql.DB) {
+func RegisterUser(user models.User, db sql.DB) bool {
 	hash, err := HashPassword(user.Password)
-	if err == nil {
-		db.ExecContext(ctx, "INSERT INTO users(username, hash_password, access_token) VALUES (?, ?, ?)", user.Username, hash)
-	} else {
-		log.Fatal("Something went wrong, when tried to add new user.")
+	if err != nil {
+		log.Fatal(err)
+		return false
 	}
+	_, err = db.ExecContext(ctx, "INSERT INTO users(username, hash_password, access_token) VALUES (?, ?, ?)", user.Username, hash)
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+	return true
 }
