@@ -36,5 +36,5 @@ func Connect() {
 }
 
 func RegisterUser(user models.User, db sql.DB) {
-	db.ExecContext(ctx, "INSERT INTO users(username, hash_password, )")
+	db.ExecContext(ctx, "INSERT INTO users(username, hash_password, access_token) VALUES (?, ?, ?)")
 }
