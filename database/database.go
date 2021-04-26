@@ -80,3 +80,12 @@ func AddWish(wish models.Wish) error {
 	}
 	return err
 }
+
+func DeleteWish(wish models.Wish) error {
+	_, err := db.Exec("DELETE FROM wishes WHERE name = ? AND description = ?", wish.Name, wish.Description)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	return err
+}
