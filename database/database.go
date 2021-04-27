@@ -66,7 +66,7 @@ func RegisterUser(user models.User) error {
 }
 
 func AddWish(wish models.Wish) error {
-	_, err := db.Exec("INSERT INTO wishes(name, description) VALUES(?, ?)", wish.Name, wish.Description)
+	_, err := db.Exec("INSERT INTO wishes(name, description, user) VALUES(?, ?, ?)", wish.Name, wish.Description, wish.User)
 	if err != nil {
 		log.Fatal(err)
 		return err
