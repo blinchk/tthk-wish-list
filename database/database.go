@@ -102,19 +102,43 @@ func HideWish(wish models.Wish) error {
 }
 
 func GetSuggestion(follow models.Follow) (error, []models.Wish) {
-	rows, err := db.Query("SELECT id FROM wishes WHERE user = ?", follow.UserTo)
+	rows, err := db.Query("SELECT * FROM wishes WHERE user = ?", follow.UserTo)
 	var wish models.Wish
-	const count int = 3
-	var wishes [count]models.Wish
+	var wishes []models.Wish
 	if err != nil {
 		log.Fatal(err)
 		return err, []models.Wish{}
 	}
 	var tick int = 0
 	for rows.Next() {
-		rows.Scan(&wish.ID, &wish.Name, &wish.Description, &wish.User, &wish.Hidden)
-		wishes[tick] = wish
+		err = rows.Scan(&wish.ID, &wish.Name, &wish.Description, &wish.User, &wish.Hidden)
+		if err != nil {
+			log.Fatal(err)
+			return err, []models.Wish{}
+		}
+		wishes = append(wishes, wish)
 		tick++
 	}
-	return err, []models.Wish{}
+	return err, wishes
+}
+
+func GetWishes(user models.User) (error, []models.Wish) {
+	rows, err := db.Query("SELECT * FROM wishes WHERE user = ?", user.ID)
+	var wish models.Wish
+	var wishes []models.Wish
+	if err != nil {
+		log.Fatal(err)
+		return err, []models.Wish{}
+	}
+	var tick int = 0
+	for rows.Next() {
+		err = rows.Scan(&wish.ID, &wish.Name, &wish.Description, &wish.User, &wish.Hidden)
+		if err != nil {
+			log.Fatal(err)
+			return err, []models.Wish{}
+		}
+		wishes = append(wishes, wish)
+		tick++
+	}
+	return err, wishes
 }
