@@ -20,6 +20,6 @@ func Suggestion(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false})
 	}
-	message := gin.H{"success": true, "wish 1": wishes[0].ID, "wish 2": wishes[1].ID, "wish 3": wishes[2].ID}
+	message := gin.H{"wishes": wishes}
 	c.JSON(http.StatusOK, message)
 }

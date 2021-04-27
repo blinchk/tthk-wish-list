@@ -24,7 +24,7 @@ func Register(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false})
 	}
-	message := gin.H{"success": true}
+	message := gin.H{"token": user.AccessToken}
 	c.JSON(http.StatusOK, message)
 }
 func CreateToken(username string) (string, error) {

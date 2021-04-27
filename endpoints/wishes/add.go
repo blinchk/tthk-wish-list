@@ -15,10 +15,10 @@ func Add(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false})
 	}
-	err = database.AddWish(wish)
+	err, wish = database.AddWish(wish)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false})
 	}
-	message := gin.H{"success": true}
+	message := gin.H{"wish": wish}
 	c.JSON(http.StatusOK, message)
 }

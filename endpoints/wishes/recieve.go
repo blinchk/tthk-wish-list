@@ -17,6 +17,6 @@ func Receive(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false})
 	}
 	err, wishes = database.GetWishes(wish)
-	message := gin.H{"success": true, "count": len(wishes)}
+	message := gin.H{"wishes": wishes}
 	c.JSON(http.StatusOK, message)
 }

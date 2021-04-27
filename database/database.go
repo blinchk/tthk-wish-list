@@ -71,40 +71,40 @@ func RegisterUser(user models.User) error {
 	return err
 }
 
-func AddWish(wish models.Wish) error {
+func AddWish(wish models.Wish) (error, models.Wish) {
 	_, err := db.Exec("INSERT INTO wishes(name, description, user) VALUES(?, ?, ?)", wish.Name, wish.Description, wish.User)
 	if err != nil {
 		log.Fatal(err)
-		return err
+		return err, wish
 	}
-	return err
+	return err, wish
 }
 
-func DeleteWish(wish models.Wish) error {
+func DeleteWish(wish models.Wish) (error, models.Wish) {
 	_, err := db.Exec("DELETE FROM wishes WHERE id = ?", wish.ID)
 	if err != nil {
 		log.Fatal(err)
-		return err
+		return err, wish
 	}
-	return err
+	return err, wish
 }
 
-func EditWish(wish models.Wish) error {
+func EditWish(wish models.Wish) (error, models.Wish) {
 	_, err := db.Exec("UPDATE wishes SET name = ?, description = ? WHERE id = ?", wish.Name, wish.Description, wish.ID)
 	if err != nil {
 		log.Fatal(err)
-		return err
+		return err, wish
 	}
-	return err
+	return err, wish
 }
 
-func HideWish(wish models.Wish) error {
+func HideWish(wish models.Wish) (error, models.Wish) {
 	_, err := db.Exec("UPDATE wishes SET hidden = !hidden WHERE id = ?", wish.ID)
 	if err != nil {
 		log.Fatal(err)
-		return err
+		return err, wish
 	}
-	return err
+	return err, wish
 }
 
 func GetSuggestion(follow models.Follow) (error, []models.Wish) {

@@ -15,10 +15,10 @@ func Edit(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false})
 	}
-	err = database.EditWish(wish)
+	err, wish = database.EditWish(wish)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false})
 	}
-	message := gin.H{"success": true}
+	message := gin.H{"wish": wish}
 	c.JSON(http.StatusOK, message)
 }

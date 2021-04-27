@@ -15,10 +15,10 @@ func Delete(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false})
 	}
-	err = database.DeleteWish(wish)
+	err, wish = database.DeleteWish(wish)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false})
 	}
-	message := gin.H{"success": true}
+	message := gin.H{"wish": wish}
 	c.JSON(http.StatusOK, message)
 }
