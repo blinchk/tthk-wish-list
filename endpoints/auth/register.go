@@ -16,7 +16,7 @@ func Register(c *gin.Context) {
 	var err error
 	c.BindJSON(&user)
 	user.AccessToken, err = CreateToken(user.Username)
-	user.RegistrationTime = time.Now().Format("2021-04-26 22:49:50")
+	user.RegistrationTime = time.Now().Format("2006-01-02 15:04:05")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false})
 	}
