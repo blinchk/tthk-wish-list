@@ -100,3 +100,21 @@ func HideWish(wish models.Wish) error {
 	}
 	return err
 }
+
+func GetSuggestion(follow models.Follow) (error, []models.Wish) {
+	rows, err := db.Query("SELECT id FROM wishes WHERE user = ?", follow.UserTo)
+	var wish models.Wish
+	const count int = 3
+	var wishes [count]models.Wish
+	if err != nil {
+		log.Fatal(err)
+		return err, []models.Wish{}
+	}
+	var tick int = 0
+	for rows.Next() {
+		rows.Scan(&wish.ID, &wish.Name, &wish.Description, &wish.User, &wish.Hidden)
+		wishes[tick] = wish
+		tick++
+	}
+	return err, []models.Wish{}
+}
