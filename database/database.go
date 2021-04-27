@@ -122,9 +122,8 @@ func GetSuggestion(follow models.Follow) (error, []models.Wish) {
 	return err, wishes
 }
 
-func GetWishes(user models.User) (error, []models.Wish) {
-	rows, err := db.Query("SELECT * FROM wishes WHERE user = ?", user.ID)
-	var wish models.Wish
+func GetWishes(wish models.Wish) (error, []models.Wish) {
+	rows, err := db.Query("SELECT * FROM wishes WHERE user = ?", wish.User)
 	var wishes []models.Wish
 	if err != nil {
 		log.Fatal(err)

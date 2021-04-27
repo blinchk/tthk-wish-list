@@ -14,7 +14,7 @@ func main() {
 	authAPI.POST("/login", auth.Login)
 	wishAPI := router.Group("/wishes")
 	wishAPI.GET("/suggestion", wishes.Suggestion)
-	wishAPI.POST("/recieve", wishes.Receive)
+	wishAPI.GET("/recieve", wishes.Receive)
 	wishAPI.POST("/hide", wishes.Hide)
 	wishAPI.POST("/add", wishes.Add)
 	wishAPI.POST("/delete", wishes.Delete)
