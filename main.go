@@ -24,7 +24,7 @@ func isAuthorized(endpoint func(c *gin.Context)) gin.HandlerFunc {
 			})
 
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"err": false})
+				c.JSON(http.StatusInternalServerError, gin.H{"Valid token": false})
 			}
 
 			if token.Valid {
