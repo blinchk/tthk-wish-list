@@ -52,7 +52,6 @@ func VerifyUser(user models.User) error {
 func RegisterUser(user models.User) error {
 	hash, err := HashPassword(user.Password)
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 	_, err = db.Exec("INSERT INTO users(username, first_name, last_name, hash_password, access_token, registration_time) "+
