@@ -57,7 +57,7 @@ func RegisterUser(user models.User) error {
 	}
 	_, err = db.Exec("INSERT INTO users(username, first_name, last_name, hash_password, access_token, registration_time) "+
 		"VALUES (?, ?, ?, ?, ?)",
-		user.Username, user.FirstName, user.LastName, hash, user.AccessToken, time.Now().Format("2021-04-26 22:49:50"))
+		user.Username, user.FirstName, user.LastName, hash, user.AccessToken, user.RegistrationTime)
 	if err != nil {
 		log.Fatal(err)
 		return err
@@ -92,8 +92,8 @@ func EditWish(wish models.Wish) error {
 	return err
 }
 
-func HideWish(pool models.Pool) error {
-	_, err := db.Exec("UPDATE pool SET hidden = !hidden WHERE id = ?", pool.ID)
+func HideWish(wish models.Wish) error {
+	_, err := db.Exec("UPDATE wishes SET hidden = !hidden WHERE id = ?", wish.ID)
 	if err != nil {
 		log.Fatal(err)
 		return err

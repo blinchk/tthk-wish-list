@@ -9,13 +9,13 @@ import (
 )
 
 func Hide(c *gin.Context) {
-	var pool models.Pool
+	var wish models.Wish
 	var err error
-	c.BindJSON(&pool)
+	c.BindJSON(&wish)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false})
 	}
-	err = database.HideWish(pool)
+	err = database.HideWish(wish)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false})
 	}

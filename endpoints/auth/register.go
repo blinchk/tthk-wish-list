@@ -3,6 +3,7 @@ package auth
 import (
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/bredbrains/tthk-wish-list/database"
 	"github.com/bredbrains/tthk-wish-list/models"
@@ -15,6 +16,7 @@ func Register(c *gin.Context) {
 	var err error
 	c.BindJSON(&user)
 	user.AccessToken, err = CreateToken(user.Username)
+	user.RegistrationTime = time.Now().Format("2021-04-26 22:49:50")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false})
 	}
