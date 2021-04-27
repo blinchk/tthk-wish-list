@@ -10,8 +10,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"net/http"
-	"os"
 )
 
 func Register(c *gin.Context) {

@@ -5,12 +5,14 @@ import (
 	"net/http"
 	"os"
 
+	"time"
+
 	"github.com/bredbrains/tthk-wish-list/database"
 	"github.com/bredbrains/tthk-wish-list/endpoints/auth"
 	"github.com/bredbrains/tthk-wish-list/endpoints/wishes"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"time"
 )
 
 func isAuthorized(endpoint func(c *gin.Context)) gin.HandlerFunc {
