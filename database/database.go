@@ -56,7 +56,7 @@ func RegisterUser(user models.User) error {
 		return err
 	}
 	_, err = db.Exec("INSERT INTO users(username, first_name, last_name, hash_password, access_token, registration_time) "+
-		"VALUES (?, ?, ?, ?, ?)",
+		"VALUES (?, ?, ?, ?, ?, ?)",
 		user.Username, user.FirstName, user.LastName, hash, user.AccessToken, user.RegistrationTime)
 	if err != nil {
 		log.Fatal(err)
