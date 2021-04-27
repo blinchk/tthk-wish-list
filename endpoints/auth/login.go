@@ -10,15 +10,16 @@ import (
 
 func Login(c *gin.Context) {
 	var user models.User
+	var verified bool
 	var err error
 	c.BindJSON(&user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false})
 	}
-	err = database.VerifyUser(user)
+	err, verified = database.VerifyUser(user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false})
 	}
-	message := gin.H{"success": true}
+	message := gin.H{"verified": verified}
 	c.JSON(http.StatusOK, message)
 }

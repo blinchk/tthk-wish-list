@@ -37,16 +37,22 @@ func Connect() {
 	db.SetMaxIdleConns(10)
 }
 
-func VerifyUser(user models.User) error {
+func VerifyUser(user models.User) (error, bool) {
 	row := db.QueryRow("SELECT hash_password FROM users WHERE username = ?", user.Username)
 	var hash_password string
 	var err error
+	var verified bool
+	if err != nil {
+		log.Fatal(err)
+		return err, false
+	}
 	err = row.Scan(&hash_password)
 	if err != nil {
 		log.Fatal(err)
-		return err
+		return err, false
 	}
-	return err
+	verified = CheckPasswordHash(user.Password, hash_password)
+	return err, verified
 }
 
 func RegisterUser(user models.User) error {

@@ -10,8 +10,8 @@ import (
 func main() {
 	router := gin.Default()
 	authAPI := router.Group("/auth")
-	authAPI.POST("/register", auth.Register)
 	authAPI.POST("/login", auth.Login)
+	authAPI.POST("/register", auth.Register)
 	wishAPI := router.Group("/wishes")
 	wishAPI.GET("/suggestion", wishes.Suggestion)
 	wishAPI.GET("/recieve", wishes.Receive)
