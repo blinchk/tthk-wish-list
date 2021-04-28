@@ -61,9 +61,9 @@ func main() {
 	wishAPI.POST("/hide", isAuthorized(wishes.Hide))
 	wishAPI.POST("/add", isAuthorized(wishes.Add))
 	wishAPI.POST("/delete", isAuthorized(wishes.Delete))
-	wishAPI.POST("/edit", isAuthorized(wishes.Edit))
+	wishAPI.POST("/update", isAuthorized(wishes.Update))
 	database.Connect()
 	// Use in production build
 	// autotls.Run(r, "wish-api.bredbrains.tech")
-	router.Run("")
+	router.Run()
 }

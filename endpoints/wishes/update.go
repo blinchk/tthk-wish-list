@@ -8,14 +8,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Edit(c *gin.Context) {
+func Update(c *gin.Context) {
 	var wish models.Wish
 	var err error
 	c.BindJSON(&wish)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false})
 	}
-	err, wish = database.EditWish(wish)
+	err, wish = database.UpdateWish(wish)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false})
 	}

@@ -86,7 +86,7 @@ func DeleteWish(wish models.Wish) (error, models.Wish) {
 	return err, wish
 }
 
-func EditWish(wish models.Wish) (error, models.Wish) {
+func UpdateWish(wish models.Wish) (error, models.Wish) {
 	_, err := db.Exec("UPDATE wishes SET name = ?, description = ? WHERE id = ?", wish.Name, wish.Description, wish.ID)
 	if err != nil {
 		log.Fatal(err)
