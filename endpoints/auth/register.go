@@ -1,13 +1,15 @@
 package auth
 
 import (
+	"net/http"
+	"os"
+	"time"
+
 	"github.com/bredbrains/tthk-wish-list/database"
 	"github.com/bredbrains/tthk-wish-list/models"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"net/http"
-	"os"
 )
 
 func Register(c *gin.Context) {
@@ -24,17 +26,18 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	user.AccessToken, err = CreateToken(user.Username)
+	user.AccessToken, err = CreateToken(user.Email)
+	user.RegistrationTime = time.Now().Format("2006-01-02 15:04:05")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 	err = database.RegisterUser(user)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		c.JSON(http.StatusConflict, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	message := gin.H{"success": true, "access_token": user.AccessToken}
+	message := gin.H{"token": user.AccessToken}
 	c.JSON(http.StatusOK, message)
 }
 
