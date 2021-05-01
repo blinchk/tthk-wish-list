@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 	"time"
 
@@ -143,19 +144,20 @@ func GetSuggestion(follow models.Follow) (error, []models.Wish) {
 	return err, wishes
 }
 
-func GetWishes(wish models.Wish) (error, []models.Wish) {
-	rows, err := db.Query("SELECT * FROM wishes WHERE wish.user = ?", wish.ID)
+func GetWishes(user models.User) (error, []models.Wish) {
+	rows, err := db.Query("SELECT id FROM wishes WHERE user = ?", user.ID)
 	var wishes []models.Wish
+	var wish models.Wish
 	if err != nil {
 		log.Fatal(err)
-		return err, []models.Wish{}
+		return err, wishes
 	}
 	var tick int = 0
 	for rows.Next() {
-		err = rows.Scan(&wish.ID, &wish.Name, &wish.Description, &wish.User, &wish.Hidden)
+		err = rows.Scan(&wish.ID)
 		if err != nil {
 			log.Fatal(err)
-			return err, []models.Wish{}
+			return err, wishes
 		}
 		wishes = append(wishes, wish)
 		tick++
@@ -164,6 +166,7 @@ func GetWishes(wish models.Wish) (error, []models.Wish) {
 }
 
 func AddFollow(follow models.Follow) (error, models.Follow) {
+	fmt.Println(follow.UserFrom, follow.UserTo)
 	_, err := db.Exec("INSERT INTO follows(user_from, user_to, creation_time) VALUES(?, ?, ?)", follow.UserFrom, follow.UserTo, follow.CreationTime)
 	if err != nil {
 		log.Fatal(err)
