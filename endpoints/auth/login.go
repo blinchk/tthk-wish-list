@@ -24,7 +24,7 @@ func Login(c *gin.Context) {
 		return
 	}
 	if verified == true {
-		message := gin.H{"success": true, "access_token": accessToken}
+		message := gin.H{"success": true, "accessToken": accessToken}
 		c.JSON(http.StatusOK, message)
 	} else {
 		message := gin.H{"success": false}

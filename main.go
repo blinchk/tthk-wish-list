@@ -65,5 +65,5 @@ func main() {
 	database.Connect()
 	// Use in production build
 	// autotls.Run(r, "wish-api.bredbrains.tech")
-	router.Run("")
+	router.Run()
 }
