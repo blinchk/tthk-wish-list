@@ -11,13 +11,13 @@ import (
 func Add(c *gin.Context) {
 	var wish models.Wish
 	var err error
-	c.BindJSON(&wish)
+	err = c.BindJSON(&wish)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false})
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 	}
 	err, wish = database.AddWish(wish)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false})
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 	}
 	message := gin.H{"wish": wish}
 	c.JSON(http.StatusOK, message)
