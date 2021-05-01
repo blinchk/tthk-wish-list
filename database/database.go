@@ -42,7 +42,10 @@ func VerifyUser(user models.User) (error, bool, string) {
 	var hashPassword string
 	var accessToken string
 	var verified bool
-	err := db.QueryRow("SELECT hash_password, access_token FROM users WHERE email = ?", user.Email).Scan(&hashPassword, &accessToken)
+	rows, err := db.Query("SELECT hash_password, access_token FROM users WHERE email = ?", user.Email)
+	for rows.Next() {
+		rows.Scan(&hashPassword, &accessToken)
+	}
 	if err != nil {
 		log.Fatal(err)
 		return err, false, ""
@@ -64,6 +67,23 @@ func RegisterUser(user models.User) error {
 		return err
 	}
 	return err
+}
+
+func UserData(accessToken string) (error, models.User) {
+	var user models.User
+	rows, err := db.Query("SELECT email, first_name, last_name FROM users WHERE access_token = ?", accessToken)
+	if err != nil {
+		log.Fatal(err)
+		return err, user
+	}
+	for rows.Next() {
+		err = rows.Scan(&user.Email, &user.FirstName, &user.LastName)
+	}
+	if err != nil {
+		log.Fatal(err)
+		return err, user
+	}
+	return err, user
 }
 
 func AddWish(wish models.Wish) (error, models.Wish) {

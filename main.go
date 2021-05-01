@@ -9,7 +9,6 @@ import (
 
 	"github.com/bredbrains/tthk-wish-list/database"
 	"github.com/bredbrains/tthk-wish-list/endpoints/auth"
-	"github.com/bredbrains/tthk-wish-list/endpoints/follows"
 	"github.com/bredbrains/tthk-wish-list/endpoints/wishes"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-contrib/cors"
@@ -63,9 +62,8 @@ func main() {
 	wishAPI.POST("/add", isAuthorized(wishes.Add))
 	wishAPI.POST("/delete", isAuthorized(wishes.Delete))
 	wishAPI.POST("/update", isAuthorized(wishes.Update))
-	followAPI := router.Group("/follows")
-	followAPI.POST("/add", isAuthorized(follows.Add))
-	followAPI.POST("/delete", isAuthorized(follows.Delete))
+	userAPI := router.Group("/user")
+	userAPI.POST("/", isAuthorized(auth.User))
 	database.Connect()
 	// Use in production build
 	// autotls.Run(r, "wish-api.bredbrains.tech")

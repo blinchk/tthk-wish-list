@@ -1,11 +1,11 @@
 package models
 
 type User struct {
-	ID               uint64 `json:"id"`
-	FirstName        string `json:"firstName"`
-	LastName         string `json:"lastName"`
-	Email            string `json:"email"`
-	Password         string `json:"password"`
-	AccessToken      string `json:"access_token"`
-	RegistrationTime string `json:"registration_time"`
+	ID               uint64 `json:"id,omitempty"`
+	FirstName        string `json:"firstName,omitempty"`
+	LastName         string `json:"lastName,omitempty"`
+	Email            string `json:"email,omitempty"`
+	Password         string `json:"password,omitempty"`
+	AccessToken      string `json:"access_token,omitempty"`
+	RegistrationTime string `json:"registration_time,omitempty"`
 }
