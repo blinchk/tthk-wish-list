@@ -42,7 +42,7 @@ func VerifyUser(user models.User) (error, bool, string) {
 	var hashPassword string
 	var accessToken string
 	var verified bool
-	err := db.QueryRow("SELECT hash_password, access_token FROM users WHERE username = ?", user.Username).Scan(&hashPassword, &accessToken)
+	err := db.QueryRow("SELECT hash_password, access_token FROM users WHERE email = ?", user.Email).Scan(&hashPassword, &accessToken)
 	if err != nil {
 		log.Fatal(err)
 		return err, false, ""
@@ -56,9 +56,9 @@ func RegisterUser(user models.User) error {
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec("INSERT INTO users(username, first_name, last_name, hash_password, access_token, registration_time) "+
+	_, err = db.Exec("INSERT INTO users(email, first_name, last_name, hash_password, access_token, registration_time) "+
 		"VALUES (?, ?, ?, ?, ?, ?)",
-		user.Username, user.FirstName, user.LastName, hash, user.AccessToken, user.RegistrationTime)
+		user.Email, user.FirstName, user.LastName, hash, user.AccessToken, user.RegistrationTime)
 	if err != nil {
 		log.Fatal(err)
 		return err

@@ -26,7 +26,7 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	user.AccessToken, err = CreateToken(user.Username)
+	user.AccessToken, err = CreateToken(user.Email)
 	user.RegistrationTime = time.Now().Format("2006-01-02 15:04:05")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
