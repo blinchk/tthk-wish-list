@@ -1,7 +1,6 @@
-package wishes
+package follows
 
 import (
-	"math/rand"
 	"net/http"
 
 	"github.com/bredbrains/tthk-wish-list/database"
@@ -9,21 +8,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Suggestion(c *gin.Context) {
-	var wishes []models.Wish
-	var user models.User
+func Delete(c *gin.Context) {
+	var follow models.Follow
 	var err error
-	err = c.BindJSON(&user)
+	err = c.BindJSON(&follow)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 	}
-	min := 0
-	max := len(database.GetFollowsFromUser(user))
-	rndInt := rand.Intn(max-min) + min
-	err, wishes = database.GetSuggestion(database.GetFollowsFromUser(user)[rndInt])
+	err, follow = database.DeleteFollow(follow)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 	}
-	message := gin.H{"wishes": wishes}
+	message := gin.H{"follow": follow}
 	c.JSON(http.StatusOK, message)
 }

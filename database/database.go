@@ -101,20 +101,41 @@ func HideWish(wish models.Wish) (error, models.Wish) {
 	return err, wish
 }
 
+func GetFollowsFromUser(user models.User) []models.Follow {
+	rows, err := db.Query("SELECT user_to FROM follows WHERE user_from = ?", user.ID)
+	var follow models.Follow
+	var follows []models.Follow
+	if err != nil {
+		log.Fatal(err)
+		return follows
+	}
+	var tick int = 0
+	for rows.Next() {
+		err = rows.Scan(&follow.UserTo)
+		if err != nil {
+			log.Fatal(err)
+			return follows
+		}
+		follows = append(follows, follow)
+		tick++
+	}
+	return follows
+}
+
 func GetSuggestion(follow models.Follow) (error, []models.Wish) {
-	rows, err := db.Query("SELECT * FROM wishes WHERE user = ?", follow.UserTo)
+	rows, err := db.Query("SELECT id FROM wishes WHERE user = ?", follow.UserTo)
 	var wish models.Wish
 	var wishes []models.Wish
 	if err != nil {
 		log.Fatal(err)
-		return err, []models.Wish{}
+		return err, wishes
 	}
 	var tick int = 0
 	for rows.Next() {
-		err = rows.Scan(&wish.ID, &wish.Name, &wish.Description, &wish.User, &wish.Hidden)
+		err = rows.Scan(&wish.ID)
 		if err != nil {
 			log.Fatal(err)
-			return err, []models.Wish{}
+			return err, wishes
 		}
 		wishes = append(wishes, wish)
 		tick++
@@ -140,4 +161,22 @@ func GetWishes(wish models.Wish) (error, []models.Wish) {
 		tick++
 	}
 	return err, wishes
+}
+
+func AddFollow(follow models.Follow) (error, models.Follow) {
+	_, err := db.Exec("INSERT INTO follows(user_from, user_to, creation_time) VALUES(?, ?, ?)", follow.UserFrom, follow.UserTo, follow.CreationTime)
+	if err != nil {
+		log.Fatal(err)
+		return err, follow
+	}
+	return err, follow
+}
+
+func DeleteFollow(follow models.Follow) (error, models.Follow) {
+	_, err := db.Exec("DELETE FROM follows WHERE id = ?", follow.ID)
+	if err != nil {
+		log.Fatal(err)
+		return err, follow
+	}
+	return err, follow
 }

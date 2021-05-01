@@ -1,29 +1,26 @@
-package wishes
+package follows
 
 import (
-	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/bredbrains/tthk-wish-list/database"
 	"github.com/bredbrains/tthk-wish-list/models"
 	"github.com/gin-gonic/gin"
 )
 
-func Suggestion(c *gin.Context) {
-	var wishes []models.Wish
-	var user models.User
+func Add(c *gin.Context) {
+	var follow models.Follow
 	var err error
-	err = c.BindJSON(&user)
+	err = c.BindJSON(&follow)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 	}
-	min := 0
-	max := len(database.GetFollowsFromUser(user))
-	rndInt := rand.Intn(max-min) + min
-	err, wishes = database.GetSuggestion(database.GetFollowsFromUser(user)[rndInt])
+	follow.CreationTime = time.Now().Format("2006-01-02 15:04:05")
+	err, follow = database.AddFollow(follow)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 	}
-	message := gin.H{"wishes": wishes}
+	message := gin.H{"follow": follow}
 	c.JSON(http.StatusOK, message)
 }
