@@ -37,7 +37,7 @@ func isAuthorized(endpoint func(c *gin.Context)) gin.HandlerFunc {
 
 		} else {
 			message := gin.H{"Authorization": "not authorized"}
-			c.JSON(http.StatusInternalServerError, message)
+			c.JSON(http.StatusUnauthorized, message)
 		}
 
 	})
