@@ -12,9 +12,9 @@ func Receive(c *gin.Context) {
 	var wishes []models.Wish
 	var wish models.Wish
 	var err error
-	c.BindJSON(&wish)
+	err = c.BindJSON(&wish)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false})
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 	}
 	err, wishes = database.GetWishes(wish)
 	message := gin.H{"wishes": wishes}
