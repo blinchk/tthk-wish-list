@@ -23,12 +23,11 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false})
 		return
 	}
-	if verified == true {
+	if verified {
 		message := gin.H{"success": true, "access_token": accessToken}
 		c.JSON(http.StatusOK, message)
 	} else {
 		message := gin.H{"success": false}
 		c.JSON(http.StatusUnauthorized, message)
 	}
-	return
 }

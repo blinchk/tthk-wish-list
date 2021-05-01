@@ -38,13 +38,10 @@ func Connect() {
 }
 
 func VerifyUser(user models.User) (error, bool, string) {
-	var err error
-	row := db.QueryRow("SELECT hash_password, access_token FROM users WHERE username = ?", user.Username)
 	var hashPassword string
 	var accessToken string
-
 	var verified bool
-	err = row.Scan(&hashPassword, &accessToken)
+	err := db.QueryRow("SELECT hash_password, access_token FROM users WHERE username = ?", user.Username).Scan(&hashPassword, &accessToken)
 	if err != nil {
 		log.Fatal(err)
 		return err, false, ""
