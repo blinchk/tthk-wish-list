@@ -104,7 +104,7 @@ func UserDataById(id int) (error, models.User) {
 }
 
 func AddWish(wish models.Wish) (error, models.Wish) {
-	_, err := db.Exec("INSERT INTO wishes(name, description, user) VALUES(?, ?, ?)", wish.Name, wish.Description, wish.User)
+	_, err := db.Exec("INSERT INTO wishes(name, description, user) VALUES(?, ?, ?)", wish.Name, wish.Description, wish.User.ID)
 	if err != nil {
 		log.Fatal(err)
 		return err, wish

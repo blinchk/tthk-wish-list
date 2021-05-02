@@ -1,6 +1,7 @@
 package wishes
 
 import (
+	"github.com/go-playground/validator/v10"
 	"net/http"
 
 	"github.com/bredbrains/tthk-wish-list/database"
@@ -15,10 +16,16 @@ func Add(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 	}
+	v := validator.New()
+	err = v.Struct(wish)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		return
+	}
 	err, wish = database.AddWish(wish)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 	}
-	message := gin.H{"wish": wish}
+	message := gin.H{"success": true, "wish": wish}
 	c.JSON(http.StatusOK, message)
 }
