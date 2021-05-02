@@ -3,7 +3,6 @@ package database
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"log"
 	"time"
 
@@ -204,7 +203,6 @@ func GetWishes(user models.User) (error, []models.Wish) {
 }
 
 func AddFollow(follow models.Follow) (error, models.Follow) {
-	fmt.Println(follow.UserFrom, follow.UserTo)
 	_, err := db.Exec("INSERT INTO follows(user_from, user_to, creation_time) VALUES(?, ?, ?)", follow.UserFrom, follow.UserTo, follow.CreationTime)
 	if err != nil {
 		log.Fatal(err)
