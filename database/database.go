@@ -191,11 +191,12 @@ func GetWishes(user models.User) (error, []models.Wish) {
 	}
 	var tick int = 0
 	for rows.Next() {
-		err = rows.Scan(&wish.ID, &wish.Name, &wish.Description, &wish.User, &wish.Hidden)
+		err = rows.Scan(&wish.ID, &wish.Name, &wish.Description, &user.ID, &wish.Hidden)
 		if err != nil {
 			log.Fatal(err)
 			return err, wishes
 		}
+		err, wish.User = UserDataById(user.ID)
 		wishes = append(wishes, wish)
 		tick++
 	}
