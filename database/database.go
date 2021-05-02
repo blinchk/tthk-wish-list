@@ -88,7 +88,7 @@ func UserData(accessToken string) (error, models.User) {
 
 func UserDataById(id int) (error, models.User) {
 	var user models.User
-	rows, err := db.Query("SELECT id, first_name, last_name FROM users WHERE access_token = ?", id)
+	rows, err := db.Query("SELECT id, first_name, last_name FROM users WHERE id = ?", id)
 	if err != nil {
 		log.Fatal(err)
 		return err, user

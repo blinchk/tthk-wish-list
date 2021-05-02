@@ -20,7 +20,7 @@ func Wishes(c *gin.Context) {
 	}
 	user := models.User{ID: id}
 	err, wishes = database.GetWishes(user)
-	err, user = database.UserDataById(user.ID)
+	err, user = database.UserDataById(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
