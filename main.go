@@ -63,7 +63,7 @@ func main() {
 	wishAPI.POST("/delete", isAuthorized(wishes.Delete))
 	wishAPI.POST("/update", isAuthorized(wishes.Update))
 	userAPI := router.Group("/user")
-	userAPI.POST("/", isAuthorized(auth.User))
+	userAPI.GET("/", isAuthorized(auth.User))
 	userAPI.GET("/:id/wishes", isAuthorized(users.Wishes))
 	database.Connect()
 	// Use in production build
