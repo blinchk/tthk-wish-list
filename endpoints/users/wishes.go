@@ -1,16 +1,15 @@
-package wishes
+package users
 
 import (
 	"fmt"
-	"net/http"
-	"strconv"
-
 	"github.com/bredbrains/tthk-wish-list/database"
 	"github.com/bredbrains/tthk-wish-list/models"
 	"github.com/gin-gonic/gin"
+	"net/http"
+	"strconv"
 )
 
-func Receive(c *gin.Context) {
+func Wishes(c *gin.Context) {
 	var wishes []models.Wish
 	var err error
 	id, err := strconv.Atoi(c.Param("id"))
@@ -21,11 +20,12 @@ func Receive(c *gin.Context) {
 	}
 	user := models.User{ID: id}
 	err, wishes = database.GetWishes(user)
+	err, user = database.UserDataById(user.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	message := gin.H{"wishes": wishes}
+	message := gin.H{"success": true, "wishes": wishes, "user": user}
 	c.JSON(http.StatusOK, message)
 	return
 }

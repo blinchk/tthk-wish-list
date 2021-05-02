@@ -71,13 +71,30 @@ func RegisterUser(user models.User) error {
 
 func UserData(accessToken string) (error, models.User) {
 	var user models.User
-	rows, err := db.Query("SELECT email, first_name, last_name FROM users WHERE access_token = ?", accessToken)
+	rows, err := db.Query("SELECT id, email, first_name, last_name FROM users WHERE access_token = ?", accessToken)
 	if err != nil {
 		log.Fatal(err)
 		return err, user
 	}
 	for rows.Next() {
-		err = rows.Scan(&user.Email, &user.FirstName, &user.LastName)
+		err = rows.Scan(&user.ID, &user.Email, &user.FirstName, &user.LastName)
+	}
+	if err != nil {
+		log.Fatal(err)
+		return err, user
+	}
+	return err, user
+}
+
+func UserDataById(id int) (error, models.User) {
+	var user models.User
+	rows, err := db.Query("SELECT id, first_name, last_name FROM users WHERE access_token = ?", id)
+	if err != nil {
+		log.Fatal(err)
+		return err, user
+	}
+	for rows.Next() {
+		err = rows.Scan(&user.ID, &user.FirstName, &user.LastName)
 	}
 	if err != nil {
 		log.Fatal(err)

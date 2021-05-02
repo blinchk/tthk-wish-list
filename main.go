@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/bredbrains/tthk-wish-list/endpoints/users"
 	"net/http"
 	"os"
 
@@ -55,15 +56,15 @@ func main() {
 	authAPI := router.Group("/auth")
 	authAPI.POST("/login", auth.Login)
 	authAPI.POST("/register", auth.Register)
-	wishAPI := router.Group("/wishes")
+	wishAPI := router.Group("/wish")
 	wishAPI.GET("/suggestion", isAuthorized(wishes.Suggestion))
-	wishAPI.GET("/recieve/:id", isAuthorized(wishes.Receive))
 	wishAPI.POST("/hide", isAuthorized(wishes.Hide))
 	wishAPI.POST("/add", isAuthorized(wishes.Add))
 	wishAPI.POST("/delete", isAuthorized(wishes.Delete))
 	wishAPI.POST("/update", isAuthorized(wishes.Update))
 	userAPI := router.Group("/user")
 	userAPI.POST("/", isAuthorized(auth.User))
+	userAPI.GET("/:id/wishes", isAuthorized(users.Wishes))
 	database.Connect()
 	// Use in production build
 	// autotls.Run(r, "wish-api.bredbrains.tech")
