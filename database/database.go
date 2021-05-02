@@ -165,7 +165,7 @@ func GetSuggestion(follow models.Follow) (error, []models.Wish) {
 }
 
 func GetWishes(user models.User) (error, []models.Wish) {
-	rows, err := db.Query("SELECT id FROM wishes WHERE user = ?", user.ID)
+	rows, err := db.Query("SELECT * FROM wishes WHERE user = ?", user.ID)
 	var wishes []models.Wish
 	var wish models.Wish
 	if err != nil {
@@ -174,7 +174,7 @@ func GetWishes(user models.User) (error, []models.Wish) {
 	}
 	var tick int = 0
 	for rows.Next() {
-		err = rows.Scan(&wish.ID)
+		err = rows.Scan(&wish.ID, &wish.Name, &wish.Description, &wish.User, &wish.Hidden)
 		if err != nil {
 			log.Fatal(err)
 			return err, wishes
