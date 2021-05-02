@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"log"
+	"os"
 	"time"
 
 	"github.com/bredbrains/tthk-wish-list/models"
@@ -28,7 +29,7 @@ func CheckPasswordHash(password, hash string) bool {
 
 func Connect() {
 	var err error
-	db, err = sql.Open("mysql", "wish_list:LVA7ECV3ucv3MGDp@tcp(mysql-db.bredbrains.tech)/wish_list")
+	db, err = sql.Open("mysql", os.Getenv("MYSQL_CONNECTION_STRING"))
 	if err != nil {
 		panic(err)
 	}

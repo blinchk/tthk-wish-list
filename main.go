@@ -18,7 +18,6 @@ import (
 
 func isAuthorized(endpoint func(c *gin.Context)) gin.HandlerFunc {
 	return gin.HandlerFunc(func(c *gin.Context) {
-
 		if c.Request.Header["Token"] != nil {
 			token, err := jwt.Parse(c.Request.Header["Token"][0], func(token *jwt.Token) (interface{}, error) {
 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
