@@ -47,7 +47,6 @@ func VerifyUser(user models.User) (error, bool, string) {
 		rows.Scan(&hashPassword, &accessToken)
 	}
 	if err != nil {
-		log.Fatal(err)
 		return err, false, ""
 	}
 	verified = CheckPasswordHash(user.Password, hashPassword)
@@ -73,14 +72,12 @@ func UserData(accessToken string) (error, models.User) {
 	var user models.User
 	rows, err := db.Query("SELECT id, email, first_name, last_name FROM users WHERE access_token = ?", accessToken)
 	if err != nil {
-		log.Fatal(err)
 		return err, user
 	}
 	for rows.Next() {
 		err = rows.Scan(&user.ID, &user.Email, &user.FirstName, &user.LastName)
 	}
 	if err != nil {
-		log.Fatal(err)
 		return err, user
 	}
 	return err, user
@@ -88,16 +85,8 @@ func UserData(accessToken string) (error, models.User) {
 
 func UserDataById(id int) (error, models.User) {
 	var user models.User
-	rows, err := db.Query("SELECT id, first_name, last_name FROM users WHERE id = ?", id)
+	err := db.QueryRow("SELECT id, first_name, last_name FROM users WHERE id = ?", id).Scan(&user.ID, &user.FirstName, &user.LastName)
 	if err != nil {
-		log.Fatal(err)
-		return err, user
-	}
-	for rows.Next() {
-		err = rows.Scan(&user.ID, &user.FirstName, &user.LastName)
-	}
-	if err != nil {
-		log.Fatal(err)
 		return err, user
 	}
 	return err, user
@@ -106,7 +95,6 @@ func UserDataById(id int) (error, models.User) {
 func AddWish(wish models.Wish) (error, models.Wish) {
 	_, err := db.Exec("INSERT INTO wishes(name, description, user) VALUES(?, ?, ?)", wish.Name, wish.Description, wish.User.ID)
 	if err != nil {
-		log.Fatal(err)
 		return err, wish
 	}
 	return err, wish
@@ -115,7 +103,6 @@ func AddWish(wish models.Wish) (error, models.Wish) {
 func DeleteWish(wish models.Wish) (error, models.Wish) {
 	_, err := db.Exec("DELETE FROM wishes WHERE id = ?", wish.ID)
 	if err != nil {
-		log.Fatal(err)
 		return err, wish
 	}
 	return err, wish
@@ -124,7 +111,6 @@ func DeleteWish(wish models.Wish) (error, models.Wish) {
 func UpdateWish(wish models.Wish) (error, models.Wish) {
 	_, err := db.Exec("UPDATE wishes SET name = ?, description = ? WHERE id = ?", wish.Name, wish.Description, wish.ID)
 	if err != nil {
-		log.Fatal(err)
 		return err, wish
 	}
 	return err, wish
@@ -133,7 +119,6 @@ func UpdateWish(wish models.Wish) (error, models.Wish) {
 func HideWish(wish models.Wish) (error, models.Wish) {
 	_, err := db.Exec("UPDATE wishes SET hidden = !hidden WHERE id = ?", wish.ID)
 	if err != nil {
-		log.Fatal(err)
 		return err, wish
 	}
 	return err, wish
@@ -144,14 +129,12 @@ func GetFollowsFromUser(user models.User) []models.Follow {
 	var follow models.Follow
 	var follows []models.Follow
 	if err != nil {
-		log.Fatal(err)
 		return follows
 	}
 	var tick int = 0
 	for rows.Next() {
 		err = rows.Scan(&follow.UserTo)
 		if err != nil {
-			log.Fatal(err)
 			return follows
 		}
 		follows = append(follows, follow)
@@ -165,14 +148,12 @@ func GetSuggestion(follow models.Follow) (error, []models.Wish) {
 	var wish models.Wish
 	var wishes []models.Wish
 	if err != nil {
-		log.Fatal(err)
 		return err, wishes
 	}
 	var tick int = 0
 	for rows.Next() {
 		err = rows.Scan(&wish.ID)
 		if err != nil {
-			log.Fatal(err)
 			return err, wishes
 		}
 		wishes = append(wishes, wish)
@@ -186,14 +167,12 @@ func GetWishes(user models.User) (error, []models.Wish) {
 	var wishes []models.Wish
 	var wish models.Wish
 	if err != nil {
-		log.Fatal(err)
 		return err, wishes
 	}
 	var tick int = 0
 	for rows.Next() {
 		err = rows.Scan(&wish.ID, &wish.Name, &wish.Description, &user.ID, &wish.Hidden, &wish.CreationTime)
 		if err != nil {
-			log.Fatal(err)
 			return err, wishes
 		}
 		err, wish.User = UserDataById(user.ID)
@@ -206,7 +185,6 @@ func GetWishes(user models.User) (error, []models.Wish) {
 func AddFollow(follow models.Follow) (error, models.Follow) {
 	_, err := db.Exec("INSERT INTO follows(user_from, user_to, creation_time) VALUES(?, ?, ?)", follow.UserFrom, follow.UserTo, follow.CreationTime)
 	if err != nil {
-		log.Fatal(err)
 		return err, follow
 	}
 	return err, follow
@@ -215,7 +193,6 @@ func AddFollow(follow models.Follow) (error, models.Follow) {
 func DeleteFollow(follow models.Follow) (error, models.Follow) {
 	_, err := db.Exec("DELETE FROM follows WHERE id = ?", follow.ID)
 	if err != nil {
-		log.Fatal(err)
 		return err, follow
 	}
 	return err, follow
