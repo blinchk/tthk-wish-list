@@ -191,7 +191,7 @@ func GetWishes(user models.User) (error, []models.Wish) {
 	}
 	var tick int = 0
 	for rows.Next() {
-		err = rows.Scan(&wish.ID, &wish.Name, &wish.Description, &user.ID, &wish.Hidden)
+		err = rows.Scan(&wish.ID, &wish.Name, &wish.Description, &user.ID, &wish.Hidden, &wish.CreationTime)
 		if err != nil {
 			log.Fatal(err)
 			return err, wishes
