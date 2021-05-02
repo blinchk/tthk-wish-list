@@ -19,7 +19,7 @@ func GetUserProfile(c *gin.Context) {
 	}
 	err, user = database.UserDataById(id)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Requested user isn't exists."})
 		return
 	}
 	err, wishes = database.GetWishes(user)
