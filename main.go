@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/bredbrains/tthk-wish-list/endpoints/follows"
 	"github.com/bredbrains/tthk-wish-list/endpoints/users"
 	"net/http"
 	"os"
@@ -66,6 +67,7 @@ func main() {
 	userAPI.POST("/", isAuthorized(users.EditUserProfile))
 	userAPI.GET("/:id", users.GetUserProfile)
 	userAPI.GET("/:id/wishes", isAuthorized(users.Wishes))
+	userAPI.POST("/:id/follow", isAuthorized(follows.ToggleFollowing))
 	database.Connect()
 	// Use in production build
 	// autotls.Run(r, "wish-api.bredbrains.tech")
