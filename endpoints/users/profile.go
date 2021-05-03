@@ -4,7 +4,6 @@ import (
 	"github.com/bredbrains/tthk-wish-list/database"
 	"github.com/bredbrains/tthk-wish-list/models"
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"net/http"
 	"strconv"
 )
@@ -42,8 +41,10 @@ func EditUserProfile(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "error": "You don't have permissions for this."})
 		return
 	}
-	v := validator.New()
-	err = v.Struct(user)
+	if len(newUser.FirstName) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "This fields cannot be blank."})
+		return
+	}
 	newUser.ID = user.ID
 	err, user = database.EditUser(newUser)
 	if err != nil {
