@@ -44,7 +44,8 @@ func EditUserProfile(c *gin.Context) {
 	}
 	v := validator.New()
 	err = v.Struct(user)
-	err, user = database.EditUser(user)
+	newUser.ID = user.ID
+	err, user = database.EditUser(newUser)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Requested user isn't exists."})
 		return
