@@ -197,3 +197,11 @@ func DeleteFollow(follow models.Follow) (error, models.Follow) {
 	}
 	return err, follow
 }
+
+func EditUser(user models.User) (error, models.User) {
+	_, err := db.Exec("UPDATE users SET first_name = ?, last_name = ? WHERE id = ?", user.FirstName, user.LastName, user.ID)
+	if err != nil {
+		return err, user
+	}
+	return err, user
+}
