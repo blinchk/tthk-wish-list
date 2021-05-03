@@ -3,6 +3,7 @@ package users
 import (
 	"github.com/bredbrains/tthk-wish-list/database"
 	"github.com/bredbrains/tthk-wish-list/models"
+	"github.com/bredbrains/tthk-wish-list/modules"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -21,18 +22,7 @@ func GetUserProfile(c *gin.Context) {
 			c.JSON(http.StatusUnauthorized, gin.H{"success": false, "error": "Invalid token"})
 			return
 		}
-		if requestingUser.ID != id {
-			follows := database.GetFollowsFromUser(requestingUser)
-			for _, follow := range follows {
-				if int(follow.UserTo) == id {
-					following = true
-					break
-				}
-			}
-		} else {
-			following = false
-			isSameUser = true
-		}
+		following, isSameUser = modules.CheckIsFollowed(requestingUser, id)
 	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
