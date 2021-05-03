@@ -198,6 +198,17 @@ func DeleteFollow(follow models.Follow) (error, models.Follow) {
 	return err, follow
 }
 
+func GetWish(id int) (error, models.Wish) {
+	var wish models.Wish
+	var userID int
+	err := db.QueryRow("SELECT id, name, description, user, hidden, creation_time FROM wishes WHERE id = ?", id).Scan(&wish.ID, &wish.Name, &wish.Description, &userID, &wish.Hidden, &wish.CreationTime)
+	err, wish.User = UserDataById(userID)
+	if err != nil {
+		return err, wish
+	}
+	return err, wish
+}
+  
 func EditUser(user models.User) (error, models.User) {
 	_, err := db.Exec("UPDATE users SET first_name = ?, last_name = ? WHERE id = ?", user.FirstName, user.LastName, user.ID)
 	if err != nil {
