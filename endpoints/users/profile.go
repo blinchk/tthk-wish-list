@@ -34,9 +34,14 @@ func GetUserProfile(c *gin.Context) {
 func EditUserProfile(c *gin.Context) {
 	var wishes []models.Wish
 	var newUser models.User
-	c.BindJSON(&newUser)
+	var user models.User
+	var err error
+	err = c.BindJSON(&newUser)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid request body."})
+	}
 	accessToken := c.GetHeader("Token")
-	err, user := database.UserData(accessToken)
+	err, user = database.UserData(accessToken)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "error": "You don't have permissions for this."})
 		return
