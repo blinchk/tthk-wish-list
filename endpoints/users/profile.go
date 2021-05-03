@@ -12,7 +12,28 @@ func GetUserProfile(c *gin.Context) {
 	var wishes []models.Wish
 	var user models.User
 	var err error
+	var following, isSameUser bool
 	id, err := strconv.Atoi(c.Param("id"))
+	token := c.GetHeader("Token")
+	if token != "" {
+		err, requestingUser := database.UserData(token)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"success": false, "error": "Invalid token"})
+			return
+		}
+		if requestingUser.ID != id {
+			follows := database.GetFollowsFromUser(requestingUser)
+			for _, follow := range follows {
+				if int(follow.UserTo) == id {
+					following = true
+					break
+				}
+			}
+		} else {
+			following = false
+			isSameUser = true
+		}
+	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
@@ -27,7 +48,11 @@ func GetUserProfile(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "user": user, "wishes": wishes})
+	if token != "" && !isSameUser {
+		c.JSON(http.StatusOK, gin.H{"success": true, "user": user, "wishes": wishes, "following": following})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"success": true, "user": user, "wishes": wishes})
+	}
 	return
 }
 
