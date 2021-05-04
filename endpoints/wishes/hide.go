@@ -14,11 +14,14 @@ func Hide(c *gin.Context) {
 	err = c.BindJSON(&wish)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
 	}
 	err, wish = database.HideWish(wish)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
 	}
 	message := gin.H{"wish": wish}
 	c.JSON(http.StatusOK, message)
+	return
 }
