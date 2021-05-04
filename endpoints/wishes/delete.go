@@ -1,9 +1,10 @@
 package wishes
 
 import (
-	"github.com/bredbrains/tthk-wish-list/models"
 	"net/http"
 	"strconv"
+
+	"github.com/bredbrains/tthk-wish-list/models"
 
 	"github.com/bredbrains/tthk-wish-list/database"
 	"github.com/gin-gonic/gin"

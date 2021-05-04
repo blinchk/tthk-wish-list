@@ -37,7 +37,7 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusConflict, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	message := gin.H{"token": user.AccessToken}
+	message := gin.H{"success": true, "token": user.AccessToken}
 	c.JSON(http.StatusOK, message)
 }
 

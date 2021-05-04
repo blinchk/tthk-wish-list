@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/bredbrains/tthk-wish-list/endpoints/follows"
-	"github.com/bredbrains/tthk-wish-list/endpoints/users"
 	"net/http"
 	"os"
+
+	"github.com/bredbrains/tthk-wish-list/endpoints/follows"
+	"github.com/bredbrains/tthk-wish-list/endpoints/users"
 
 	"time"
 
@@ -61,7 +62,7 @@ func main() {
 	wishAPI.POST("/hide", isAuthorized(wishes.Hide))
 	wishAPI.POST("/add", isAuthorized(wishes.Add))
 	wishAPI.DELETE("/:id", isAuthorized(wishes.Delete))
-	wishAPI.POST("/update", isAuthorized(wishes.Update))
+	wishAPI.PATCH("/:id", isAuthorized(wishes.Update))
 	userAPI := router.Group("/user")
 	userAPI.GET("/", isAuthorized(auth.User))
 	userAPI.POST("/", isAuthorized(users.EditUserProfile))

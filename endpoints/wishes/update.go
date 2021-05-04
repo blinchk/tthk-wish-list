@@ -6,6 +6,7 @@ import (
 	"github.com/bredbrains/tthk-wish-list/database"
 	"github.com/bredbrains/tthk-wish-list/models"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 func Update(c *gin.Context) {
@@ -16,12 +17,18 @@ func Update(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
+	v := validator.New()
+	err = v.Struct(wish)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		return
+	}
 	err, wish = database.UpdateWish(wish)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	message := gin.H{"wish": wish}
+	message := gin.H{"success": true, "wish": wish}
 	c.JSON(http.StatusOK, message)
 	return
 }

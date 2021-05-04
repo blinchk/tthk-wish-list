@@ -21,7 +21,7 @@ func Hide(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	message := gin.H{"wish": wish}
+	message := gin.H{"success": true, "wish": wish}
 	c.JSON(http.StatusOK, message)
 	return
 }

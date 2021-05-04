@@ -19,6 +19,6 @@ func Delete(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 	}
-	message := gin.H{"follow": follow}
+	message := gin.H{"success": true, "follow": follow}
 	c.JSON(http.StatusOK, message)
 }

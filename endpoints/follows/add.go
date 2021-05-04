@@ -2,10 +2,11 @@ package follows
 
 import (
 	"fmt"
-	"github.com/bredbrains/tthk-wish-list/modules"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/bredbrains/tthk-wish-list/modules"
 
 	"github.com/bredbrains/tthk-wish-list/database"
 	"github.com/bredbrains/tthk-wish-list/models"
@@ -25,7 +26,7 @@ func Add(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 	}
-	message := gin.H{"follow": follow}
+	message := gin.H{"success": true, "follow": follow}
 	c.JSON(http.StatusOK, message)
 }
 
