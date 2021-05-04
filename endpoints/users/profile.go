@@ -1,12 +1,13 @@
 package users
 
 import (
+	"net/http"
+	"strconv"
+
 	"github.com/bredbrains/tthk-wish-list/database"
 	"github.com/bredbrains/tthk-wish-list/models"
 	"github.com/bredbrains/tthk-wish-list/modules"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"strconv"
 )
 
 func GetUserProfile(c *gin.Context) {
@@ -55,6 +56,7 @@ func EditUserProfile(c *gin.Context) {
 	err = c.BindJSON(&newUser)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid request body."})
+		return
 	}
 	accessToken := c.GetHeader("Token")
 	err, user = database.UserData(accessToken)
