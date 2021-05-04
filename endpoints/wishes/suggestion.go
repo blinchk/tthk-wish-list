@@ -16,6 +16,7 @@ func Suggestion(c *gin.Context) {
 	err = c.BindJSON(&user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
 	}
 	min := 0
 	max := len(database.GetFollowsFromUser(user))
@@ -23,7 +24,9 @@ func Suggestion(c *gin.Context) {
 	err, wishes = database.GetSuggestion(database.GetFollowsFromUser(user)[rndInt])
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
 	}
 	message := gin.H{"wishes": wishes}
 	c.JSON(http.StatusOK, message)
+	return
 }
