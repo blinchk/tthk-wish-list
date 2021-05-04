@@ -43,6 +43,9 @@ func VerifyUser(user models.User) (error, bool, string) {
 	var accessToken string
 	var verified bool
 	rows, err := db.Query("SELECT hash_password, access_token FROM users WHERE email = ?", user.Email)
+	if err != nil {
+		return err, false, ""
+	}
 	for rows.Next() {
 		rows.Scan(&hashPassword, &accessToken)
 	}
@@ -99,12 +102,12 @@ func AddWish(wish models.Wish) (error, models.Wish) {
 	return err, wish
 }
 
-func DeleteWish(wish models.Wish) (error, models.Wish) {
+func DeleteWish(wish models.Wish) error {
 	_, err := db.Exec("DELETE FROM wishes WHERE id = ?", wish.ID)
 	if err != nil {
-		return err, wish
+		return err
 	}
-	return err, wish
+	return err
 }
 
 func UpdateWish(wish models.Wish) (error, models.Wish) {
