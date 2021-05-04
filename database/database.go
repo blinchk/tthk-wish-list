@@ -190,12 +190,12 @@ func AddFollow(follow models.Follow) (error, models.Follow) {
 	return err, follow
 }
 
-func DeleteFollow(follow models.Follow) (error, models.Follow) {
-	_, err := db.Exec("DELETE FROM follows WHERE id = ?", follow.ID)
+func DeleteFollow(follow models.Follow) error {
+	_, err := db.Exec("DELETE FROM follows WHERE user_from = ? AND user_to = ? ", follow.UserFrom, follow.UserTo)
 	if err != nil {
-		return err, follow
+		return err
 	}
-	return err, follow
+	return err
 }
 
 func GetWish(id int) (error, models.Wish) {
@@ -208,7 +208,7 @@ func GetWish(id int) (error, models.Wish) {
 	}
 	return err, wish
 }
-  
+
 func EditUser(user models.User) (error, models.User) {
 	_, err := db.Exec("UPDATE users SET first_name = ?, last_name = ? WHERE id = ?", user.FirstName, user.LastName, user.ID)
 	if err != nil {
