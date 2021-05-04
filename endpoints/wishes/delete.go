@@ -33,7 +33,7 @@ func Delete(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "error": "You don't have permissions for this."})
 		return
 	}
-	err, wish = database.DeleteWish(wish)
+	err = database.DeleteWish(wish)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
