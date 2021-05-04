@@ -11,9 +11,19 @@ import (
 func Hide(c *gin.Context) {
 	var wish models.Wish
 	var err error
+	var allowed bool
 	err = c.BindJSON(&wish)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	err, allowed = CheckWishPermissions(wish, c.GetHeader("Token"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	if !allowed {
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"success": false, "error": "This action is not allowed for you."})
 		return
 	}
 	err, wish = database.HideWish(wish)
