@@ -15,6 +15,7 @@ func Add(c *gin.Context) {
 	err = c.BindJSON(&wish)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
 	}
 	v := validator.New()
 	err = v.Struct(wish)
@@ -25,7 +26,9 @@ func Add(c *gin.Context) {
 	err, wish = database.AddWish(wish)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
 	}
 	message := gin.H{"success": true, "wish": wish}
 	c.JSON(http.StatusOK, message)
+	return
 }
