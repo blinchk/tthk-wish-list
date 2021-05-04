@@ -12,12 +12,13 @@ import (
 func GetUserProfile(c *gin.Context) {
 	var wishes []models.Wish
 	var user models.User
+	var requestingUser models.User
 	var err error
 	var following, isSameUser bool
 	id, err := strconv.Atoi(c.Param("id"))
 	token := c.GetHeader("Token")
 	if token != "" {
-		err, requestingUser := database.UserData(token)
+		err, requestingUser = database.UserData(token)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"success": false, "error": "Invalid token"})
 			return
