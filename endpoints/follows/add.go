@@ -33,7 +33,7 @@ func ToggleFollowing(c *gin.Context) {
 	var follow models.Follow
 	var userCalled models.User
 	var err error
-	var idToConvert int64
+	var id int
 	token := c.GetHeader("Token")
 	err, userCalled = database.UserData(token)
 	if err != nil {
@@ -41,20 +41,17 @@ func ToggleFollowing(c *gin.Context) {
 		return
 	}
 	database.GetFollowsFromUser(userCalled)
-	calledId := uint64(userCalled.ID)
-	idToConvert, err = strconv.ParseInt(c.Param("id"), 10, 64)
-	idForCheck, err := strconv.Atoi(c.Param("id"))
-	id := uint64(idToConvert)
+	id, err = strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "User with this ID doesn't exist."})
 		return
 	}
-	following, isSameUser := modules.CheckIsFollowed(userCalled, idForCheck)
+	following, isSameUser := modules.CheckIsFollowed(userCalled, id)
 	if isSameUser {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "You cannot start follow yourself."})
 		return
 	} else {
-		follow = models.Follow{UserFrom: calledId, UserTo: id, CreationTime: time.Now().Format("2006-01-02 15:04:05")}
+		follow = models.Follow{UserFrom: userCalled.ID, UserTo: id, CreationTime: time.Now().Format("2006-01-02 15:04:05")}
 		if following {
 			err = database.DeleteFollow(follow)
 			if err != nil {
