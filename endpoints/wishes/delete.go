@@ -32,7 +32,7 @@ func Delete(c *gin.Context) {
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"success": false, "error": "This action is not allowed for you."})
 		return
 	}
-	err, wish = database.DeleteWish(wish)
+	err = database.DeleteWish(wish)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
