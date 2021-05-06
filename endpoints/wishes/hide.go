@@ -2,6 +2,7 @@ package wishes
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/bredbrains/tthk-wish-list/database"
 	"github.com/bredbrains/tthk-wish-list/models"
@@ -12,9 +13,9 @@ func Hide(c *gin.Context) {
 	var wish models.Wish
 	var err error
 	var allowed bool
-	err = c.BindJSON(&wish)
+	wish.ID, err = strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 	err, allowed = CheckWishPermissions(wish, c.GetHeader("Token"))

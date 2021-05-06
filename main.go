@@ -36,7 +36,7 @@ func isAuthorized(endpoint func(c *gin.Context)) gin.HandlerFunc {
 			}
 
 		} else {
-			message := gin.H{"Authorization": "not authorized"}
+			message := gin.H{"success": false, "error": "You are not authorized"}
 			c.JSON(http.StatusUnauthorized, message)
 		}
 
@@ -58,13 +58,13 @@ func main() {
 	authAPI.POST("/register", auth.Register)
 	wishAPI := router.Group("/wish")
 	wishAPI.GET("/suggestion", isAuthorized(wishes.Suggestion))
-	wishAPI.POST("/hide", isAuthorized(wishes.Hide))
 	wishAPI.PUT("/", isAuthorized(wishes.Add))
 	wishAPI.DELETE("/:id", isAuthorized(wishes.Delete))
-	wishAPI.POST("/update", isAuthorized(wishes.Update))
+	wishAPI.PATCH("/", isAuthorized(wishes.Update))
+	wishAPI.PATCH("/:id/hide", isAuthorized(wishes.Hide))
 	userAPI := router.Group("/user")
 	userAPI.GET("/", isAuthorized(auth.User))
-	userAPI.POST("/", isAuthorized(users.EditUserProfile))
+	userAPI.PATCH("/", isAuthorized(users.EditUserProfile))
 	userAPI.GET("/:id", users.GetUserProfile)
 	userAPI.GET("/:id/wishes", isAuthorized(users.Wishes))
 	userAPI.POST("/:id/follow", isAuthorized(follows.ToggleFollowing))
