@@ -11,8 +11,8 @@ import (
 
 func Delete(c *gin.Context) {
 	var err error
-	var user models.User
 	var wish models.Wish
+	var allowed bool
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Bad ID of wish."})
@@ -23,13 +23,13 @@ func Delete(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	err, user = database.UserData(c.GetHeader("Token"))
+	err, allowed = CheckWishPermissions(wish, c.GetHeader("Token"))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	if wish.User.ID != user.ID {
-		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "error": "You don't have permissions for this."})
+	if !allowed {
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"success": false, "error": "This action is not allowed for you."})
 		return
 	}
 	err, wish = database.DeleteWish(wish)
