@@ -13,23 +13,19 @@ func Hide(c *gin.Context) {
 	var wish models.Wish
 	var err error
 	var user models.User
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Bad ID of wish."})
-		return
-	}
-	err, wish = database.GetWish(id)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	err, user = database.UserData(c.GetHeader("Token"))
+	var allowed bool
+	err = c.BindJSON(&wish)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	if wish.User.ID != user.ID {
-		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "error": "You don't have permissions for this."})
+	err, allowed = CheckWishPermissions(wish, c.GetHeader("Token"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	if !allowed {
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"success": false, "error": "This action is not allowed for you."})
 		return
 	}
 	err, wish = database.HideWish(wish)
