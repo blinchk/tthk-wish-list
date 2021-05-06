@@ -3,7 +3,6 @@ package wishes
 import (
 	"net/http"
 	"strconv"
-
 	"github.com/bredbrains/tthk-wish-list/database"
 	"github.com/bredbrains/tthk-wish-list/models"
 	"github.com/gin-gonic/gin"
