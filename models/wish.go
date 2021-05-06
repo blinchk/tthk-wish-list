@@ -1,9 +1,10 @@
 package models
 
 type Wish struct {
-	ID          uint64 `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	User        uint64 `json:"user"`
-	Hidden      bool   `json:"hidden"`
+	ID           int    `json:"id,omitempty"`
+	Name         string `json:"name,omitempty"`
+	Description  string `json:"description,omitempty"`
+	User         User   `json:"user,omitempty"`
+	Hidden       bool   `json:"hidden,omitempty"`
+	CreationTime string `json:"creationTime,omitempty"`
 }

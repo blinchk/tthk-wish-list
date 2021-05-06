@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/bredbrains/tthk-wish-list/endpoints/follows"
+	"github.com/bredbrains/tthk-wish-list/endpoints/users"
 	"net/http"
 	"os"
 
@@ -17,7 +19,6 @@ import (
 
 func isAuthorized(endpoint func(c *gin.Context)) gin.HandlerFunc {
 	return gin.HandlerFunc(func(c *gin.Context) {
-
 		if c.Request.Header["Token"] != nil {
 			token, err := jwt.Parse(c.Request.Header["Token"][0], func(token *jwt.Token) (interface{}, error) {
 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -35,7 +36,7 @@ func isAuthorized(endpoint func(c *gin.Context)) gin.HandlerFunc {
 			}
 
 		} else {
-			message := gin.H{"Authorization": "not authorized"}
+			message := gin.H{"success": false, "error": "You are not authorized"}
 			c.JSON(http.StatusUnauthorized, message)
 		}
 
@@ -55,15 +56,18 @@ func main() {
 	authAPI := router.Group("/auth")
 	authAPI.POST("/login", auth.Login)
 	authAPI.POST("/register", auth.Register)
-	wishAPI := router.Group("/wishes")
+	wishAPI := router.Group("/wish")
 	wishAPI.GET("/suggestion", isAuthorized(wishes.Suggestion))
-	wishAPI.GET("/recieve", isAuthorized(wishes.Receive))
-	wishAPI.POST("/hide", isAuthorized(wishes.Hide))
-	wishAPI.POST("/add", isAuthorized(wishes.Add))
-	wishAPI.POST("/delete", isAuthorized(wishes.Delete))
-	wishAPI.POST("/update", isAuthorized(wishes.Update))
+	wishAPI.PUT("/", isAuthorized(wishes.Add))
+	wishAPI.DELETE("/:id", isAuthorized(wishes.Delete))
+	wishAPI.PATCH("/", isAuthorized(wishes.Update))
+	wishAPI.PATCH("/:id/hide", isAuthorized(wishes.Hide))
 	userAPI := router.Group("/user")
-	userAPI.POST("/", isAuthorized(auth.User))
+	userAPI.GET("/", isAuthorized(auth.User))
+	userAPI.PATCH("/", isAuthorized(users.EditUserProfile))
+	userAPI.GET("/:id", users.GetUserProfile)
+	userAPI.GET("/:id/wishes", isAuthorized(users.Wishes))
+	userAPI.POST("/:id/follow", isAuthorized(follows.ToggleFollowing))
 	database.Connect()
 	// Use in production build
 	// autotls.Run(r, "wish-api.bredbrains.tech")

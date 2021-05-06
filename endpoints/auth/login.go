@@ -30,4 +30,5 @@ func Login(c *gin.Context) {
 		message := gin.H{"success": false, "error": "Invalid credentials."}
 		c.JSON(http.StatusUnauthorized, message)
 	}
+	return
 }
