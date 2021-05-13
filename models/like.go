@@ -1,9 +1,9 @@
 package models
 
 type Like struct {
-	ID           int    `json:"id,omitempty"`
-	Wish         int    `json:"wish,omitempty"`
-	Comment      int    `json:"comment,omitempty"`
-	User         User   `json:"user,omitempty"`
-	CreationTime string `json:"creation_time,omitempty"`
+	ID             int    `json:"id,omitempty"`
+	Connection     int    `json:"connection,omitempty"`
+	ConnectionType string `json:"connection_type,omitempty"`
+	User           User   `json:"user,omitempty"`
+	CreationTime   string `json:"creation_time,omitempty"`
 }
