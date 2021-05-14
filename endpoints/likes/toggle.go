@@ -15,7 +15,7 @@ func ToggleLike(c *gin.Context) {
 	var message gin.H
 	err = c.BindJSON(&like)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Request body is invalid."})
 		return
 	}
 	token := c.GetHeader("Token")

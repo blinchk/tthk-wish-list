@@ -1,8 +1,9 @@
 package wishes
 
 import (
-	"github.com/go-playground/validator/v10"
 	"net/http"
+
+	"github.com/go-playground/validator/v10"
 
 	"github.com/bredbrains/tthk-wish-list/database"
 	"github.com/bredbrains/tthk-wish-list/models"
@@ -14,7 +15,7 @@ func Add(c *gin.Context) {
 	var err error
 	err = c.BindJSON(&wish)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid wish."})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Request body is invalid."})
 		return
 	}
 	v := validator.New()
