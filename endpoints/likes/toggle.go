@@ -30,11 +30,11 @@ func ToggleLike(c *gin.Context) {
 	}
 	if database.LikeExist(like) {
 		database.DeleteLike(like)
-		message = gin.H{"success": true}
+		message = gin.H{"success": true, "liked": false}
 	} else {
 		like.CreationTime = time.Now().Format("2006-01-02 15:04:05")
 		database.AddLike(like)
-		message = gin.H{"success": true, "like": like}
+		message = gin.H{"success": true, "liked": true, "like": like}
 	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
