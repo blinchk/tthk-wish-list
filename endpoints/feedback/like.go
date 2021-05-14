@@ -1,4 +1,4 @@
-package likes
+package feedback
 
 import (
 	"net/http"
@@ -8,6 +8,10 @@ import (
 	"github.com/bredbrains/tthk-wish-list/models"
 	"github.com/gin-gonic/gin"
 )
+
+func GetLike(c *gin.Context) {
+
+}
 
 func ToggleLike(c *gin.Context) {
 	var like models.Like
