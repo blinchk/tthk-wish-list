@@ -267,3 +267,11 @@ func DeleteLike(like models.Like) error {
 	}
 	return err
 }
+
+func AddComment(comment models.Comment) (error, models.Comment) {
+	_, err := db.Exec("INSERT INTO comments(content, connection, connection_type, user, creation_time) VALUES(?, ?, ?, ?, ?)", comment.Content, comment.Connection, comment.ConnectionType, comment.User.ID, comment.CreationTime)
+	if err != nil {
+		return err, comment
+	}
+	return err, comment
+}
