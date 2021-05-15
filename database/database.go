@@ -294,3 +294,11 @@ func UpdateComment(comment models.Comment) (error, models.Comment) {
 	}
 	return err, comment
 }
+
+func DeleteComment(comment models.Comment) error {
+	_, err := db.Exec("DELETE FROM comments WHERE id = ?", comment.ID)
+	if err != nil {
+		return err
+	}
+	return err
+}
