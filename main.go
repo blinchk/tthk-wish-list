@@ -65,6 +65,7 @@ func main() {
 	wishAPI.PATCH("/", isAuthorized(wishes.Update))
 	wishAPI.PATCH("/:id/hide", isAuthorized(wishes.Hide))
 	wishAPI.POST("/like", isAuthorized(feedback.ToggleLike))
+	wishAPI.GET("/:id/like", isAuthorized(feedback.GetLike))
 	userAPI := router.Group("/user")
 	userAPI.GET("/", isAuthorized(auth.User))
 	userAPI.PATCH("/", isAuthorized(users.EditUserProfile))
