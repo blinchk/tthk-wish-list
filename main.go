@@ -32,15 +32,18 @@ func isAuthorized(endpoint func(c *gin.Context)) gin.HandlerFunc {
 
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"Valid token": false})
+				return
 			}
 
 			if token != nil && token.Valid {
 				endpoint(c)
+				return
 			}
 
 		} else {
 			message := gin.H{"success": false, "error": "You are not authorized"}
 			c.JSON(http.StatusUnauthorized, message)
+			return
 		}
 
 	})
