@@ -25,6 +25,7 @@ func GetLike(c *gin.Context) {
 		message = gin.H{"success": true, "liked": true, "like": like}
 	}
 	c.JSON(http.StatusOK, message)
+	return
 }
 
 func ToggleLike(c *gin.Context) {
@@ -59,4 +60,5 @@ func ToggleLike(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, message)
+	return
 }
