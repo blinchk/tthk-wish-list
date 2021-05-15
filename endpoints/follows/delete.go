@@ -14,11 +14,14 @@ func Delete(c *gin.Context) {
 	err = c.BindJSON(&follow)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Request body is invalid."})
+		return
 	}
 	err = database.DeleteFollow(follow)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
 	}
 	message := gin.H{"follow": follow}
 	c.JSON(http.StatusOK, message)
+	return
 }
