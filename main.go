@@ -70,6 +70,7 @@ func main() {
 	wishAPI.POST("/comment", isAuthorized(comments.Add))
 	wishAPI.PATCH("/:id/comment", isAuthorized(comments.Update))
 	wishAPI.DELETE("/:id/comment", isAuthorized(comments.Delete))
+	wishAPI.GET("/:id/comment", isAuthorized(comments.GetComment))
 	userAPI := router.Group("/user")
 	userAPI.GET("/", isAuthorized(auth.User))
 	userAPI.PATCH("/", isAuthorized(users.EditUserProfile))
