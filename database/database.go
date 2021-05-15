@@ -268,8 +268,27 @@ func DeleteLike(like models.Like) error {
 	return err
 }
 
+func GetComment(id int) (error, models.Comment) {
+	var comment models.Comment
+	var userID int
+	err := db.QueryRow("SELECT * FROM comments WHERE id = ?", id).Scan(&comment.ID, &comment.Content, &comment.Connection, &comment.ConnectionType, &userID, &comment.CreationTime)
+	err, comment.User = UserDataById(userID)
+	if err != nil {
+		return err, comment
+	}
+	return err, comment
+}
+
 func AddComment(comment models.Comment) (error, models.Comment) {
 	_, err := db.Exec("INSERT INTO comments(content, connection, connection_type, user, creation_time) VALUES(?, ?, ?, ?, ?)", comment.Content, comment.Connection, comment.ConnectionType, comment.User.ID, comment.CreationTime)
+	if err != nil {
+		return err, comment
+	}
+	return err, comment
+}
+
+func UpdateComment(comment models.Comment) (error, models.Comment) {
+	_, err := db.Exec("UPDATE comments SET content = ?, connection = ?, connection_type = ?, user = ?, creation_time = ?", comment.Content, comment.Connection, comment.ConnectionType, comment.User.ID, comment.CreationTime)
 	if err != nil {
 		return err, comment
 	}
