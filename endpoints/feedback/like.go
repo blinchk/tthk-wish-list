@@ -2,6 +2,7 @@ package feedback
 
 import (
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/bredbrains/tthk-wish-list/database"
@@ -10,7 +11,20 @@ import (
 )
 
 func GetLike(c *gin.Context) {
-
+	var like models.Like
+	var message gin.H
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Bad ID of like."})
+		return
+	}
+	err, like = database.GetLike(id)
+	if err != nil {
+		message = gin.H{"success": true, "liked": false}
+	} else {
+		message = gin.H{"success": true, "liked": true, "like": like}
+	}
+	c.JSON(http.StatusOK, message)
 }
 
 func ToggleLike(c *gin.Context) {
