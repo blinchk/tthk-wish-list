@@ -42,11 +42,11 @@ func Register(c *gin.Context) {
 	return
 }
 
-func CreateToken(username string) (string, error) {
+func CreateToken(email string) (string, error) {
 	var err error
 	atClaims := jwt.MapClaims{}
 	atClaims["authorized"] = true
-	atClaims["user_name"] = username
+	atClaims["user_name"] = email
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
 	token, err := at.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
 	if err != nil {

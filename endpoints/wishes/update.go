@@ -14,7 +14,7 @@ func Update(c *gin.Context) {
 	err = c.BindJSON(&wish)
 	var allowed bool
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Request body is invalid."})
 		return
 	}
 	err, allowed = CheckWishPermissions(wish, c.GetHeader("Token"))

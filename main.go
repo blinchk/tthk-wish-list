@@ -2,10 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/bredbrains/tthk-wish-list/endpoints/follows"
-	"github.com/bredbrains/tthk-wish-list/endpoints/users"
 	"net/http"
 	"os"
+
+	"github.com/bredbrains/tthk-wish-list/endpoints/feedback"
+	"github.com/bredbrains/tthk-wish-list/endpoints/feedback/comments"
+	"github.com/bredbrains/tthk-wish-list/endpoints/follows"
+	"github.com/bredbrains/tthk-wish-list/endpoints/users"
 
 	"time"
 
@@ -29,15 +32,18 @@ func isAuthorized(endpoint func(c *gin.Context)) gin.HandlerFunc {
 
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"Valid token": false})
+				return
 			}
 
 			if token != nil && token.Valid {
 				endpoint(c)
+				return
 			}
 
 		} else {
 			message := gin.H{"success": false, "error": "You are not authorized"}
 			c.JSON(http.StatusUnauthorized, message)
+			return
 		}
 
 	})
@@ -62,6 +68,12 @@ func main() {
 	wishAPI.DELETE("/:id", isAuthorized(wishes.Delete))
 	wishAPI.PATCH("/", isAuthorized(wishes.Update))
 	wishAPI.PATCH("/:id/hide", isAuthorized(wishes.Hide))
+	wishAPI.POST("/like", isAuthorized(feedback.ToggleLike))
+	wishAPI.GET("/:id/like", isAuthorized(feedback.GetLike))
+	wishAPI.POST("/comment", isAuthorized(comments.Add))
+	wishAPI.PATCH("/:id/comment", isAuthorized(comments.Update))
+	wishAPI.DELETE("/:id/comment", isAuthorized(comments.Delete))
+	wishAPI.GET("/:id/comment", isAuthorized(comments.GetComment))
 	userAPI := router.Group("/user")
 	userAPI.GET("/", isAuthorized(auth.User))
 	userAPI.PATCH("/", isAuthorized(users.EditUserProfile))

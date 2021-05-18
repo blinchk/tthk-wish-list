@@ -201,7 +201,7 @@ func DeleteFollow(follow models.Follow) error {
 func GetWish(id int) (error, models.Wish) {
 	var wish models.Wish
 	var userID int
-	err := db.QueryRow("SELECT id, name, description, user, hidden, creation_time FROM wishes WHERE id = ?", id).Scan(&wish.ID, &wish.Name, &wish.Description, &userID, &wish.Hidden, &wish.CreationTime)
+	err := db.QueryRow("SELECT * FROM wishes WHERE id = ?", id).Scan(&wish.ID, &wish.Name, &wish.Description, &userID, &wish.Hidden, &wish.CreationTime)
 	err, wish.User = UserDataById(userID)
 	if err != nil {
 		return err, wish
@@ -215,4 +215,90 @@ func EditUser(user models.User) (error, models.User) {
 		return err, user
 	}
 	return err, user
+}
+
+func LikeExist(like models.Like) bool {
+	rows, err := db.Query("SELECT id FROM likes WHERE connection = ? AND connection_type = ? AND user = ?", like.Connection, like.ConnectionType, like.User.ID)
+	if err != nil {
+		return false
+	}
+	for rows.Next() {
+		return true
+	}
+	return false
+}
+
+func GetLike(id int) (error, models.Like) {
+	var like models.Like
+	var userID int
+	err := db.QueryRow("SELECT * FROM likes WHERE id = ?", id).Scan(&like.ID, &like.Connection, &like.ConnectionType, &userID, &like.CreationTime)
+	err, like.User = UserDataById(userID)
+	if err != nil {
+		return err, like
+	}
+	return err, like
+}
+
+func GetLikeId(like models.Like) int {
+	var id int
+	rows, err := db.Query("SELECT id FROM likes WHERE connection = ? AND connection_type = ? AND user = ?", like.Connection, like.ConnectionType, like.User.ID)
+	if err != nil {
+		return 0
+	}
+	for rows.Next() {
+		rows.Scan(&id)
+		return id
+	}
+	return 0
+}
+
+func AddLike(like models.Like) (error, models.Like) {
+	_, err := db.Exec("INSERT INTO likes(connection, connection_type, user, creation_time) VALUES(?, ?, ?, ?)", like.Connection, like.ConnectionType, like.User.ID, like.CreationTime)
+	if err != nil {
+		return err, like
+	}
+	return err, like
+}
+
+func DeleteLike(like models.Like) error {
+	_, err := db.Exec("DELETE FROM likes WHERE id = ?", GetLikeId(like))
+	if err != nil {
+		return err
+	}
+	return err
+}
+
+func GetComment(id int) (error, models.Comment) {
+	var comment models.Comment
+	var userID int
+	err := db.QueryRow("SELECT * FROM comments WHERE id = ?", id).Scan(&comment.ID, &comment.Content, &comment.Connection, &comment.ConnectionType, &userID, &comment.CreationTime)
+	err, comment.User = UserDataById(userID)
+	if err != nil {
+		return err, comment
+	}
+	return err, comment
+}
+
+func AddComment(comment models.Comment) (error, models.Comment) {
+	_, err := db.Exec("INSERT INTO comments(content, connection, connection_type, user, creation_time) VALUES(?, ?, ?, ?, ?)", comment.Content, comment.Connection, comment.ConnectionType, comment.User.ID, comment.CreationTime)
+	if err != nil {
+		return err, comment
+	}
+	return err, comment
+}
+
+func UpdateComment(comment models.Comment) (error, models.Comment) {
+	_, err := db.Exec("UPDATE comments SET content = ?, connection = ?, connection_type = ?, user = ?, creation_time = ?", comment.Content, comment.Connection, comment.ConnectionType, comment.User.ID, comment.CreationTime)
+	if err != nil {
+		return err, comment
+	}
+	return err, comment
+}
+
+func DeleteComment(comment models.Comment) error {
+	_, err := db.Exec("DELETE FROM comments WHERE id = ?", comment.ID)
+	if err != nil {
+		return err
+	}
+	return err
 }
