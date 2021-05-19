@@ -28,6 +28,7 @@ func Connect() {
 	var err error
 	db, err = sql.Open("mysql", os.Getenv("MYSQL_CONNECTION_STRING"))
 	db.SetMaxIdleConns(10)
+	db.SetMaxOpenConns(10)
 	if err != nil {
 		panic(err)
 	}
