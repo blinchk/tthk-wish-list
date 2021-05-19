@@ -61,10 +61,6 @@ func ToggleLike(c *gin.Context) {
 		return
 	}
 	token := c.GetHeader("Token")
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
 	err, like.User = database.UserData(token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
