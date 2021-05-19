@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -84,5 +85,5 @@ func main() {
 	database.Connect()
 	// Use in production build
 	// autotls.Run(r, "wish-api.bredbrains.tech")
-	router.Run()
+	log.Fatal(router.Run())
 }
