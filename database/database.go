@@ -170,7 +170,7 @@ func GetWishes(user models.User) (error, []models.Wish) {
 	}
 	var tick = 0
 	for rows.Next() {
-		err = rows.Scan(&wish.ID, &wish.Name, &wish.Description, &user.ID, &wish.Hidden, &wish.CreationTime)
+		err = rows.Scan(&wish.ID, &wish.Name, &wish.Description, &user.ID, &wish.Hidden, &wish.Liked, &wish.Likes, &wish.CreationTime)
 		if err != nil {
 			return err, wishes
 		}
@@ -201,7 +201,7 @@ func DeleteFollow(follow models.Follow) error {
 func GetWish(id int) (error, models.Wish) {
 	var wish models.Wish
 	var userID int
-	err := db.QueryRow("SELECT * FROM wishes WHERE id = ?", id).Scan(&wish.ID, &wish.Name, &wish.Description, &userID, &wish.Hidden, &wish.CreationTime)
+	err := db.QueryRow("SELECT * FROM wishes WHERE id = ?", id).Scan(&wish.ID, &wish.Name, &wish.Description, &userID, &wish.Hidden, &wish.Liked, &wish.Likes, &wish.CreationTime)
 	err, wish.User = UserDataById(userID)
 	if err != nil {
 		return err, wish
@@ -250,6 +250,26 @@ func GetLikeId(like models.Like) int {
 		return id
 	}
 	return 0
+}
+
+func GetLikesCount(like models.Like) (error, int) {
+	var count int
+	rows, err := db.Query("SELECT COUNT(id) FROM likes WHERE connection = ? and connection_type = ?", like.Connection, like.ConnectionType)
+	if err != nil {
+		return err, 0
+	}
+	for rows.Next() {
+		rows.Scan(&count)
+	}
+	return err, count
+}
+
+func UniteLike(like models.Like, liked bool, likes int) error {
+	_, err := db.Exec("UPDATE "+like.ConnectionType+" SET liked = ?, likes = likes + ? WHERE id = ?", liked, likes, like.Connection)
+	if err != nil {
+		return err
+	}
+	return err
 }
 
 func AddLike(like models.Like) (error, models.Like) {

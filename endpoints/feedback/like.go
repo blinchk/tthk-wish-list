@@ -28,6 +28,27 @@ func GetLike(c *gin.Context) {
 	return
 }
 
+func GetLikesCount(c *gin.Context) {
+	var like models.Like
+	var count int
+	var message gin.H
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Bad ID of like."})
+		return
+	}
+	conType := c.Param("type")
+	like.Connection, like.ConnectionType = id, conType
+	err, count = database.GetLikesCount(like)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	message = gin.H{"success": true, "count": count}
+	c.JSON(http.StatusOK, message)
+	return
+}
+
 func ToggleLike(c *gin.Context) {
 	var like models.Like
 	var err error
@@ -48,12 +69,22 @@ func ToggleLike(c *gin.Context) {
 		return
 	}
 	if database.LikeExist(like) {
-		database.DeleteLike(like)
-		message = gin.H{"success": true, "liked": false}
+		err = database.UniteLike(like, false, -1)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+			return
+		}
+		err = database.DeleteLike(like)
+		message = gin.H{"success": true}
 	} else {
 		like.CreationTime = time.Now().Format("2006-01-02 15:04:05")
-		database.AddLike(like)
-		message = gin.H{"success": true, "liked": true, "like": like}
+		err = database.UniteLike(like, true, +1)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+			return
+		}
+		err, like = database.AddLike(like)
+		message = gin.H{"success": true, "like": like}
 	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})

@@ -70,6 +70,7 @@ func main() {
 	wishAPI.PATCH("/:id/hide", isAuthorized(wishes.Hide))
 	wishAPI.POST("/like", isAuthorized(feedback.ToggleLike))
 	wishAPI.GET("/:id/like", isAuthorized(feedback.GetLike))
+	wishAPI.GET("/:id/:type/likes", isAuthorized(feedback.GetLikesCount))
 	wishAPI.POST("/comment", isAuthorized(comments.Add))
 	wishAPI.PATCH("/:id/comment", isAuthorized(comments.Update))
 	wishAPI.DELETE("/:id/comment", isAuthorized(comments.Delete))
