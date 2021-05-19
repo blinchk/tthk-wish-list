@@ -264,8 +264,16 @@ func GetLikesCount(like models.Like) (error, int) {
 	return err, count
 }
 
-func UniteLike(like models.Like, liked bool, likes int) error {
-	_, err := db.Exec("UPDATE "+like.ConnectionType+" SET liked = ?, likes = likes + ? WHERE id = ?", liked, likes, like.Connection)
+func UniteLike(like models.Like, liked bool) error {
+	var likes int
+	rows, err := db.Query("SELECT COUNT(id) FROM likes WHERE connection = ? AND connection_type = ?", like.Connection, like.ConnectionType)
+	if err != nil {
+		return err
+	}
+	for rows.Next() {
+		rows.Scan(&likes)
+	}
+	_, err = db.Exec("UPDATE "+like.ConnectionType+" SET liked = ?, likes = ? WHERE id = ?", liked, likes, like.Connection)
 	if err != nil {
 		return err
 	}
