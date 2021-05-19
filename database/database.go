@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/bredbrains/tthk-wish-list/models"
 	_ "github.com/go-sql-driver/mysql"
@@ -33,9 +32,6 @@ func Connect() {
 	if err != nil {
 		panic(err)
 	}
-	db.SetConnMaxLifetime(time.Minute * 3)
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(10)
 }
 
 func VerifyUser(user models.User) (error, bool, string) {
@@ -71,14 +67,17 @@ func UserData(accessToken string) (error, models.User) {
 	var user models.User
 	rows, err := db.Query("SELECT id, email, first_name, last_name FROM users WHERE access_token = ?", accessToken)
 	if err != nil {
+		err = rows.Close()
 		return err, user
 	}
 	for rows.Next() {
 		err = rows.Scan(&user.ID, &user.Email, &user.FirstName, &user.LastName)
 	}
 	if err != nil {
+		err = rows.Close()
 		return err, user
 	}
+	err = rows.Close()
 	return err, user
 }
 
@@ -220,22 +219,30 @@ func EditUser(user models.User) (error, models.User) {
 func LikeExist(like models.Like) bool {
 	rows, err := db.Query("SELECT id FROM likes WHERE connection = ? AND connection_type = ? AND user = ?", like.Connection, like.ConnectionType, like.User.ID)
 	if err != nil {
+		err = rows.Close()
 		return false
 	}
 	for rows.Next() {
+		err = rows.Close()
 		return true
 	}
+	err = rows.Close()
 	return false
 }
 
 func GetLike(id int) (error, models.Like) {
 	var like models.Like
 	var userID int
-	err := db.QueryRow("SELECT * FROM likes WHERE id = ?", id).Scan(&like.ID, &like.Connection, &like.ConnectionType, &userID, &like.CreationTime)
+	rows, err := db.Query("SELECT * FROM likes WHERE id = ?", id)
 	err, like.User = UserDataById(userID)
 	if err != nil {
+		err = rows.Close()
 		return err, like
 	}
+	for rows.Next() {
+		rows.Scan(&like.ID, &like.Connection, &like.ConnectionType, &userID, &like.CreationTime)
+	}
+	err = rows.Close()
 	return err, like
 }
 
@@ -243,12 +250,15 @@ func GetLikeId(like models.Like) int {
 	var id int
 	rows, err := db.Query("SELECT id FROM likes WHERE connection = ? AND connection_type = ? AND user = ?", like.Connection, like.ConnectionType, like.User.ID)
 	if err != nil {
+		err = rows.Close()
 		return 0
 	}
 	for rows.Next() {
 		rows.Scan(&id)
+		err = rows.Close()
 		return id
 	}
+	err = rows.Close()
 	return 0
 }
 
@@ -256,11 +266,13 @@ func GetLikesCount(like models.Like) (error, int) {
 	var count int
 	rows, err := db.Query("SELECT COUNT(id) FROM likes WHERE connection = ? and connection_type = ?", like.Connection, like.ConnectionType)
 	if err != nil {
+		err = rows.Close()
 		return err, 0
 	}
 	for rows.Next() {
 		rows.Scan(&count)
 	}
+	err = rows.Close()
 	return err, count
 }
 
@@ -268,6 +280,7 @@ func UniteLike(like models.Like, liked bool) error {
 	var likes int
 	rows, err := db.Query("SELECT COUNT(id) FROM likes WHERE connection = ? AND connection_type = ?", like.Connection, like.ConnectionType)
 	if err != nil {
+		err = rows.Close()
 		return err
 	}
 	for rows.Next() {
@@ -275,24 +288,30 @@ func UniteLike(like models.Like, liked bool) error {
 	}
 	_, err = db.Exec("UPDATE "+like.ConnectionType+" SET liked = ?, likes = ? WHERE id = ?", liked, likes, like.Connection)
 	if err != nil {
+		err = rows.Close()
 		return err
 	}
+	err = rows.Close()
 	return err
 }
 
 func AddLike(like models.Like) (error, models.Like) {
-	_, err := db.Exec("INSERT INTO likes(connection, connection_type, user, creation_time) VALUES(?, ?, ?, ?)", like.Connection, like.ConnectionType, like.User.ID, like.CreationTime)
+	rows, err := db.Query("INSERT INTO likes(connection, connection_type, user, creation_time) VALUES(?, ?, ?, ?)", like.Connection, like.ConnectionType, like.User.ID, like.CreationTime)
 	if err != nil {
+		err = rows.Close()
 		return err, like
 	}
+	err = rows.Close()
 	return err, like
 }
 
 func DeleteLike(like models.Like) error {
-	_, err := db.Exec("DELETE FROM likes WHERE id = ?", GetLikeId(like))
+	rows, err := db.Query("DELETE FROM likes WHERE id = ?", GetLikeId(like))
 	if err != nil {
+		err = rows.Close()
 		return err
 	}
+	err = rows.Close()
 	return err
 }
 
