@@ -1,7 +1,6 @@
 package database
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"os"
@@ -12,8 +11,7 @@ import (
 )
 
 var (
-	ctx context.Context
-	db  *sql.DB
+	db *sql.DB
 )
 
 func HashPassword(password string) (string, error) {
@@ -29,6 +27,7 @@ func CheckPasswordHash(password, hash string) bool {
 func Connect() {
 	var err error
 	db, err = sql.Open("mysql", os.Getenv("MYSQL_CONNECTION_STRING"))
+	db.SetMaxIdleConns(10)
 	if err != nil {
 		panic(err)
 	}
