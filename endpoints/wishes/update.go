@@ -26,7 +26,16 @@ func Update(c *gin.Context) {
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"success": false, "error": "This action is not allowed for you."})
 		return
 	}
-	err, wish = database.UpdateWish(wish)
+	err, allowed = CheckWishPermissions(wish, c.GetHeader("Token"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	if !allowed {
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"success": false, "error": "This action is not allowed for you."})
+		return
+	}
+	err = database.UpdateWish(wish)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return

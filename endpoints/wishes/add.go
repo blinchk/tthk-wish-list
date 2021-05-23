@@ -1,6 +1,7 @@
 package wishes
 
 import (
+	"github.com/go-playground/validator/v10"
 	"net/http"
 
 	"github.com/go-playground/validator/v10"

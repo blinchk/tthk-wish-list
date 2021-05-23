@@ -106,12 +106,12 @@ func DeleteWish(wish models.Wish) error {
 	return err
 }
 
-func UpdateWish(wish models.Wish) (error, models.Wish) {
+func UpdateWish(wish models.Wish) error {
 	_, err := db.Exec("UPDATE wishes SET name = ?, description = ? WHERE id = ?", wish.Name, wish.Description, wish.ID)
 	if err != nil {
 		return err, wish
 	}
-	return err, wish
+	return err
 }
 
 func HideWish(wish models.Wish) (error, models.Wish) {
