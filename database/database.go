@@ -164,12 +164,26 @@ func GetWishes(user models.User) (error, []models.Wish) {
 	rows, err := db.Query("SELECT * FROM wishes WHERE user = ?", user.ID)
 	var wishes []models.Wish
 	var wish models.Wish
+	var liked bool
 	if err != nil {
 		return err, wishes
 	}
 	var tick = 0
+	var count int
 	for rows.Next() {
-		err = rows.Scan(&wish.ID, &wish.Name, &wish.Description, &user.ID, &wish.Hidden, &wish.Liked, &wish.Likes, &wish.CreationTime)
+		err = rows.Scan(&wish.ID, &wish.Name, &wish.Description, &user.ID, &wish.Hidden, &wish.CreationTime)
+		like := models.Like{
+			Connection:     wish.ID,
+			ConnectionType: "wishes",
+			User:           user,
+		}
+		err, count = GetLikesCount(like)
+		liked = LikeExist(like)
+		if err != nil {
+			return err, wishes
+		}
+		wish.Likes = count
+		wish.Liked = liked
 		if err != nil {
 			return err, wishes
 		}
