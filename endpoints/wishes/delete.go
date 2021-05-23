@@ -10,10 +10,11 @@ import (
 )
 
 func Delete(c *gin.Context) {
+	var id int
 	var err error
 	var wish models.Wish
 	var allowed bool
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err = strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Bad ID of wish."})
 		return

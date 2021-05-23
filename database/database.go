@@ -214,7 +214,7 @@ func DeleteFollow(follow models.Follow) error {
 func GetWish(id int) (error, models.Wish) {
 	var wish models.Wish
 	var userID int
-	err := db.QueryRow("SELECT * FROM wishes WHERE id = ?", id).Scan(&wish.ID, &wish.Name, &wish.Description, &userID, &wish.Hidden, &wish.Liked, &wish.Likes, &wish.CreationTime)
+	err := db.QueryRow("SELECT * FROM wishes WHERE id = ?", id).Scan(&wish.ID, &wish.Name, &wish.Description, &userID, &wish.Hidden, &wish.CreationTime)
 	err, wish.User = UserDataById(userID)
 	if err != nil {
 		return err, wish
