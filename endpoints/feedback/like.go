@@ -51,7 +51,6 @@ func GetLikesCount(c *gin.Context) {
 
 func ToggleLike(c *gin.Context) {
 	var like models.Like
-	var mimic models.Like
 	var liked bool
 	var err error
 	var message gin.H
@@ -66,22 +65,20 @@ func ToggleLike(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	mimic = like
 	if database.LikeExist(like) {
 		err = database.DeleteLike(like)
 		liked = false
-		message = gin.H{"success": true, "liked": false}
+		message = gin.H{"success": true, "liked": liked}
 	} else {
 		like.CreationTime = time.Now().Format("2006-01-02 15:04:05")
 		err, like = database.AddLike(like)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+			return
+		}
 		liked = true
-		message = gin.H{"success": true, "like": like, "liked": true}
+		message = gin.H{"success": true, "like": like, "liked": liked}
 	}
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	err = database.UniteLike(mimic, liked)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
