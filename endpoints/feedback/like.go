@@ -54,6 +54,7 @@ func ToggleLike(c *gin.Context) {
 	var liked bool
 	var err error
 	var message gin.H
+	var count int
 	err = c.BindJSON(&like)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Request body is invalid."})
@@ -68,7 +69,12 @@ func ToggleLike(c *gin.Context) {
 	if database.LikeExist(like) {
 		err = database.DeleteLike(like)
 		liked = false
-		message = gin.H{"success": true, "liked": liked}
+		err, count = database.GetLikesCount(like)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+			return
+		}
+		message = gin.H{"success": true, "liked": liked, "count": count}
 	} else {
 		like.CreationTime = time.Now().Format("2006-01-02 15:04:05")
 		err, like = database.AddLike(like)
@@ -77,7 +83,12 @@ func ToggleLike(c *gin.Context) {
 			return
 		}
 		liked = true
-		message = gin.H{"success": true, "like": like, "liked": liked}
+		err, count = database.GetLikesCount(like)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+			return
+		}
+		message = gin.H{"success": true, "like": like, "liked": liked, "count": count}
 	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
