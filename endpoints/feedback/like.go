@@ -1,7 +1,9 @@
 package feedback
 
 import (
+	"fmt"
 	"net/http"
+	"runtime"
 	"strconv"
 	"time"
 
@@ -10,20 +12,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetLike(c *gin.Context) {
-	var like models.Like
+func GetLikesByWish(c *gin.Context) {
+	fmt.Println(runtime.NumGoroutine())
+	var likes []models.Like
 	var message gin.H
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Bad ID of like."})
 		return
 	}
-	err, like = database.GetLike(id)
+	err, likes = database.GetLikeByType(id, "wishes")
 	if err != nil {
-		message = gin.H{"success": true, "liked": false}
-	} else {
-		message = gin.H{"success": true, "liked": true, "like": like}
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
 	}
+	message = gin.H{"success": true, "likes": likes}
 	c.JSON(http.StatusOK, message)
 	return
 }

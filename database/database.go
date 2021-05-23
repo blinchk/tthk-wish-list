@@ -247,17 +247,30 @@ func LikeExist(like models.Like) bool {
 func GetLike(id int) (error, models.Like) {
 	var like models.Like
 	var userID int
-	rows, err := db.Query("SELECT * FROM likes WHERE id = ?", id)
+	err := db.QueryRow("SELECT * FROM likes WHERE id = ?", id).Scan(&like.ID, &like.Connection, &like.ConnectionType, &userID, &like.CreationTime)
 	err, like.User = UserDataById(userID)
 	if err != nil {
-		err = rows.Close()
 		return err, like
 	}
+	return err, like
+}
+
+func GetLikeByType(id int, recType string) (error, []models.Like) {
+	var likes []models.Like
+	var like models.Like
+	var userID int
+	rows, err := db.Query("SELECT * FROM likes WHERE connection = ? AND connection_type = ?", id, recType)
 	for rows.Next() {
 		rows.Scan(&like.ID, &like.Connection, &like.ConnectionType, &userID, &like.CreationTime)
+		err, like.User = UserDataById(userID)
+		if err != nil {
+			err = rows.Close()
+			return err, likes
+		}
+		likes = append(likes, like)
 	}
 	err = rows.Close()
-	return err, like
+	return err, likes
 }
 
 func GetLikeId(like models.Like) int {
