@@ -1,12 +1,13 @@
 package users
 
 import (
+	"net/http"
+	"strconv"
+
 	"github.com/bredbrains/tthk-wish-list/database"
 	"github.com/bredbrains/tthk-wish-list/models"
 	"github.com/bredbrains/tthk-wish-list/modules"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"strconv"
 )
 
 func GetUserProfile(c *gin.Context) {
@@ -44,6 +45,18 @@ func GetUserProfile(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, gin.H{"success": true, "user": user, "wishes": wishes})
 	}
+	return
+}
+
+func GetUsersProfiles(c *gin.Context) {
+	var users []models.User
+	var err error
+	err, users = database.GetUsers()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true, "users": users})
 	return
 }
 
