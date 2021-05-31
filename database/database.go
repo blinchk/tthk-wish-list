@@ -142,9 +142,9 @@ func GetFollowsFromUser(user models.User) []models.Follow {
 }
 
 func GetUsers() (error, []models.User) {
-	var user models.User
 	var users []models.User
-	rows, err := db.Query("SELECT * FROM users")
+	var user models.User
+	rows, err := db.Query("SELECT id, first_name, last_name, email FROM users")
 	if err != nil {
 		return err, users
 	}
