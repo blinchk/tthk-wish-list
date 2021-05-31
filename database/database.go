@@ -109,7 +109,7 @@ func DeleteWish(wish models.Wish) error {
 func UpdateWish(wish models.Wish) error {
 	_, err := db.Exec("UPDATE wishes SET name = ?, description = ? WHERE id = ?", wish.Name, wish.Description, wish.ID)
 	if err != nil {
-		return err, wish
+		return err
 	}
 	return err
 }
@@ -139,6 +139,23 @@ func GetFollowsFromUser(user models.User) []models.Follow {
 		tick++
 	}
 	return follows
+}
+
+func GetUsers() (error, []models.User) {
+	var user models.User
+	var users []models.User
+	rows, err := db.Query("SELECT * FROM users")
+	if err != nil {
+		return err, users
+	}
+	for rows.Next() {
+		err = rows.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email)
+		if err != nil {
+			return err, users
+		}
+		users = append(users, user)
+	}
+	return err, users
 }
 
 func GetSuggestion(follow models.Follow) (error, []models.Wish) {
