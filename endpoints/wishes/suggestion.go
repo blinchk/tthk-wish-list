@@ -1,32 +1,25 @@
 package wishes
 
 import (
-	"math/rand"
 	"net/http"
+	"strconv"
 
 	"github.com/bredbrains/tthk-wish-list/database"
-	"github.com/bredbrains/tthk-wish-list/models"
 	"github.com/gin-gonic/gin"
 )
 
-func Suggestion(c *gin.Context) {
-	var wishes []models.Wish
-	var user models.User
+func GetSuggestion(c *gin.Context) {
 	var err error
-	err = c.BindJSON(&user)
+	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Request body is invalid."})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Bad ID of user."})
 		return
 	}
-	min := 0
-	max := len(database.GetFollowsFromUser(user))
-	rndInt := rand.Intn(max-min) + min
-	err, wishes = database.GetSuggestion(database.GetFollowsFromUser(user)[rndInt])
+	err, suggestions := database.GetSuggestions(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	message := gin.H{"wishes": wishes}
-	c.JSON(http.StatusOK, message)
+	c.JSON(http.StatusOK, gin.H{"suggestions": suggestions})
 	return
 }
