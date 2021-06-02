@@ -418,7 +418,7 @@ func DeleteComment(comment models.Comment) error {
 
 func GetGiftId(gift models.Gift) int {
 	var id int
-	rows, err := db.Query("SELECT id FROM gifts WHERE wish = ? AND follow = ?", gift.Wish, gift.Follow)
+	rows, err := db.Query("SELECT id FROM gifts WHERE wish = ? AND user = ?", gift.Wish, gift.User.ID)
 	if err != nil {
 		err = rows.Close()
 		return 0
@@ -441,7 +441,12 @@ func GetGiftsByWish(id int) (error, []models.Gift) {
 		return err, gifts
 	}
 	for rows.Next() {
-		rows.Scan(&gift.ID, &gift.Wish, &gift.Follow, &gift.CreationTime)
+		rows.Scan(&gift.ID, &gift.Wish, &gift.User.ID, &gift.CreationTime)
+		err, gift.User = UserDataById(gift.User.ID)
+		if err != nil {
+			err = rows.Close()
+			return err, gifts
+		}
 		gifts = append(gifts, gift)
 	}
 	err = rows.Close()
@@ -449,7 +454,7 @@ func GetGiftsByWish(id int) (error, []models.Gift) {
 }
 
 func GiftExist(gift models.Gift) bool {
-	rows, err := db.Query("SELECT id FROM gifts WHERE wish = ? AND follow = ?", gift.Wish, gift.Follow)
+	rows, err := db.Query("SELECT id FROM gifts WHERE wish = ? AND user = ?", gift.Wish, gift.User.ID)
 	if err != nil {
 		err = rows.Close()
 		return false
@@ -463,7 +468,7 @@ func GiftExist(gift models.Gift) bool {
 }
 
 func AddGift(gift models.Gift) (error, models.Gift) {
-	rows, err := db.Query("INSERT INTO gifts(wish, follow) VALUES(?, ?)", gift.Wish, gift.Follow)
+	rows, err := db.Query("INSERT INTO gifts(wish, user) VALUES(?, ?)", gift.Wish, gift.User.ID)
 	if err != nil {
 		err = rows.Close()
 		return err, gift

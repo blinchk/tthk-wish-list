@@ -13,6 +13,12 @@ func ToggleGift(c *gin.Context) {
 	var gift models.Gift
 	var err error
 	var message gin.H
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Bad ID of user."})
+		return
+	}
+	gift.User.ID = id
 	err = c.BindJSON(&gift)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Request body is invalid."})
