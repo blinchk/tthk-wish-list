@@ -141,6 +141,40 @@ func GetFollowsFromUser(user models.User) []models.Follow {
 	return follows
 }
 
+func GetSuggestions(id int) (error, models.Suggestion) {
+	var suggestion models.Suggestion
+	var userId int
+	var user models.User
+	var wish models.Wish
+	usersRows, err := db.Query("SELECT user_to FROM follows WHERE user_from = ?", id)
+	if err != nil {
+		err = usersRows.Close()
+		return err, suggestion
+	}
+	for usersRows.Next() {
+		err = usersRows.Scan(&userId)
+		if err != nil {
+			err = usersRows.Close()
+			return err, suggestion
+		}
+		wishesRows, err := db.Query("SELECT * FROM wishes WHERE user = ?", userId)
+		if err != nil {
+			err = wishesRows.Close()
+			return err, suggestion
+		}
+		for wishesRows.Next() {
+			err = wishesRows.Scan(&wish.ID, &wish.Name, &wish.Description, &user.ID, &wish.Hidden, &wish.CreationTime)
+			err, wish.User = UserDataById(user.ID)
+			if err != nil {
+				err = wishesRows.Close()
+				return err, suggestion
+			}
+			suggestion.Wishes = append(suggestion.Wishes, wish)
+		}
+	}
+	return err, suggestion
+}
+
 func GetUsers() (error, []models.User) {
 	var users []models.User
 	var user models.User
@@ -156,25 +190,6 @@ func GetUsers() (error, []models.User) {
 		users = append(users, user)
 	}
 	return err, users
-}
-
-func GetSuggestion(follow models.Follow) (error, []models.Wish) {
-	rows, err := db.Query("SELECT id FROM wishes WHERE user = ?", follow.UserTo)
-	var wish models.Wish
-	var wishes []models.Wish
-	if err != nil {
-		return err, wishes
-	}
-	var tick = 0
-	for rows.Next() {
-		err = rows.Scan(&wish.ID)
-		if err != nil {
-			return err, wishes
-		}
-		wishes = append(wishes, wish)
-		tick++
-	}
-	return err, wishes
 }
 
 func GetWishes(user models.User) (error, []models.Wish) {
@@ -391,5 +406,71 @@ func DeleteComment(comment models.Comment) error {
 	if err != nil {
 		return err
 	}
+	return err
+}
+
+func GetGiftId(gift models.Gift) int {
+	var id int
+	rows, err := db.Query("SELECT id FROM gifts WHERE wish = ? AND follow = ?", gift.Wish, gift.Follow)
+	if err != nil {
+		err = rows.Close()
+		return 0
+	}
+	for rows.Next() {
+		rows.Scan(&id)
+		err = rows.Close()
+		return id
+	}
+	err = rows.Close()
+	return 0
+}
+
+func GetGiftsByWish(id int) (error, []models.Gift) {
+	var gifts []models.Gift
+	var gift models.Gift
+	rows, err := db.Query("SELECT * FROM gifts WHERE wish = ?", id)
+	if err != nil {
+		err = rows.Close()
+		return err, gifts
+	}
+	for rows.Next() {
+		rows.Scan(&gift.ID, &gift.Wish, &gift.Follow, &gift.CreationTime)
+		gifts = append(gifts, gift)
+	}
+	err = rows.Close()
+	return err, gifts
+}
+
+func GiftExist(gift models.Gift) bool {
+	rows, err := db.Query("SELECT id FROM gifts WHERE wish = ? AND follow = ?", gift.Wish, gift.Follow)
+	if err != nil {
+		err = rows.Close()
+		return false
+	}
+	for rows.Next() {
+		err = rows.Close()
+		return true
+	}
+	err = rows.Close()
+	return false
+}
+
+func AddGift(gift models.Gift) (error, models.Gift) {
+	rows, err := db.Query("INSERT INTO gifts(wish, follow) VALUES(?, ?)", gift.Wish, gift.Follow)
+	if err != nil {
+		err = rows.Close()
+		return err, gift
+	}
+	err = rows.Close()
+	return err, gift
+}
+
+func DeleteGift(gift models.Gift) error {
+	rows, err := db.Query("DELETE FROM gifts WHERE id = ?", GetGiftId(gift))
+	if err != nil {
+		err = rows.Close()
+		return err
+	}
+	err = rows.Close()
 	return err
 }
