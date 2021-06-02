@@ -1,11 +1,12 @@
 package users
 
 import (
+	"net/http"
+	"strconv"
+
 	"github.com/bredbrains/tthk-wish-list/database"
 	"github.com/bredbrains/tthk-wish-list/models"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"strconv"
 )
 
 func Wishes(c *gin.Context) {
@@ -17,7 +18,12 @@ func Wishes(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	err, wishes = database.GetWishes(user)
+	err, currentUser := database.UserData(c.GetHeader("Token"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid token."})
+		return
+	}
+	err, wishes = database.GetWishes(user, currentUser)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return

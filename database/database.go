@@ -192,7 +192,7 @@ func GetUsers() (error, []models.User) {
 	return err, users
 }
 
-func GetWishes(user models.User) (error, []models.Wish) {
+func GetWishes(user models.User, currentUser models.User) (error, []models.Wish) {
 	rows, err := db.Query("SELECT * FROM wishes WHERE user = ?", user.ID)
 	var wishes []models.Wish
 	var wish models.Wish
@@ -204,13 +204,21 @@ func GetWishes(user models.User) (error, []models.Wish) {
 	var count int
 	for rows.Next() {
 		err = rows.Scan(&wish.ID, &wish.Name, &wish.Description, &user.ID, &wish.Hidden, &wish.CreationTime)
+		if err != nil {
+			return err, wishes
+		}
+		err, wish.User = UserDataById(user.ID)
 		like := models.Like{
 			Connection:     wish.ID,
 			ConnectionType: "wishes",
 			User:           user,
 		}
 		err, count = GetLikesCount(like)
-		liked = LikeExist(like)
+		if LikeExist(like) && currentUser.ID == like.User.ID {
+			liked = true
+		} else {
+			liked = false
+		}
 		if err != nil {
 			return err, wishes
 		}
@@ -219,7 +227,6 @@ func GetWishes(user models.User) (error, []models.Wish) {
 		if err != nil {
 			return err, wishes
 		}
-		err, wish.User = UserDataById(user.ID)
 		wishes = append(wishes, wish)
 		tick++
 	}

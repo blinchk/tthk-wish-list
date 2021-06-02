@@ -35,7 +35,7 @@ func GetUserProfile(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Requested user isn't exists."})
 		return
 	}
-	err, wishes = database.GetWishes(user)
+	err, wishes = database.GetWishes(user, requestingUser)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
@@ -85,7 +85,7 @@ func EditUserProfile(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Requested user isn't exists."})
 		return
 	}
-	err, wishes = database.GetWishes(user)
+	err, wishes = database.GetWishes(user, user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return

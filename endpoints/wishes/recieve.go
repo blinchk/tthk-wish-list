@@ -17,7 +17,12 @@ func Receive(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Request body is invalid."})
 		return
 	}
-	err, wishes = database.GetWishes(user)
+	err, currentUser := database.UserData(c.GetHeader("Token"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid token."})
+		return
+	}
+	err, wishes = database.GetWishes(user, currentUser)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
