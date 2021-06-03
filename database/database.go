@@ -178,12 +178,12 @@ func GetSuggestions(id int) (error, models.Suggestion) {
 func GetUsers() (error, []models.User) {
 	var users []models.User
 	var user models.User
-	rows, err := db.Query("SELECT id, first_name, last_name, email FROM users")
+	rows, err := db.Query("SELECT id, first_name, last_name FROM users")
 	if err != nil {
 		return err, users
 	}
 	for rows.Next() {
-		err = rows.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email)
+		err = rows.Scan(&user.ID, &user.FirstName, &user.LastName)
 		if err != nil {
 			return err, users
 		}

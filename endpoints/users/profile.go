@@ -48,18 +48,6 @@ func GetUserProfile(c *gin.Context) {
 	return
 }
 
-func GetUsersProfiles(c *gin.Context) {
-	var users []models.User
-	var err error
-	err, users = database.GetUsers()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "users": users})
-	return
-}
-
 func EditUserProfile(c *gin.Context) {
 	var wishes []models.Wish
 	var newUser models.User
