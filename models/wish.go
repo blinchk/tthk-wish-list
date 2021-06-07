@@ -6,7 +6,8 @@ type Wish struct {
 	Description  string `json:"description,omitempty"`
 	User         User   `json:"user,omitempty"`
 	Hidden       bool   `json:"hidden,omitempty"`
-	Liked        bool   `json:"liked"`
+	Liked        bool   `json:"liked,omitempty"`
 	Likes        int    `json:"likes,omitempty"`
+	Gifted       bool   `json:"gifted,omitempty"`
 	CreationTime string `json:"creationTime,omitempty"`
 }

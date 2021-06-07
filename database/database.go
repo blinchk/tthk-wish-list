@@ -197,6 +197,7 @@ func GetWishByIdAndUser(id int, currentUser models.User) (error, models.Wish) {
 	var wish models.Wish
 	var user models.User
 	var liked bool
+	var gifted bool
 	if err != nil {
 		return err, wish
 	}
@@ -221,11 +222,17 @@ func GetWishByIdAndUser(id int, currentUser models.User) (error, models.Wish) {
 		} else {
 			liked = false
 		}
+		if GiftExistByWish(wish) {
+			gifted = true
+		} else {
+			gifted = false
+		}
 		if err != nil {
 			return err, wish
 		}
 		wish.Likes = count
 		wish.Liked = liked
+		wish.Gifted = gifted
 		if err != nil {
 			return err, wish
 		}
@@ -238,6 +245,7 @@ func GetWishes(user models.User, currentUser models.User) (error, []models.Wish)
 	var wishes []models.Wish
 	var wish models.Wish
 	var liked bool
+	var gifted bool
 	if err != nil {
 		return err, wishes
 	}
@@ -260,11 +268,17 @@ func GetWishes(user models.User, currentUser models.User) (error, []models.Wish)
 		} else {
 			liked = false
 		}
+		if GiftExistByWish(wish) {
+			gifted = true
+		} else {
+			gifted = false
+		}
 		if err != nil {
 			return err, wishes
 		}
 		wish.Likes = count
 		wish.Liked = liked
+		wish.Gifted = gifted
 		if err != nil {
 			return err, wishes
 		}
@@ -501,8 +515,22 @@ func GetGiftsByUsers(id int, currentUser models.User) (error, []models.Gift) {
 	return err, gifts
 }
 
+func GiftExistByWish(wish models.Wish) bool {
+	rows, err := db.Query("SELECT id FROM gifts WHERE wish = ?", wish.ID)
+	if err != nil {
+		err = rows.Close()
+		return false
+	}
+	for rows.Next() {
+		err = rows.Close()
+		return true
+	}
+	err = rows.Close()
+	return false
+}
+
 func GiftExist(gift models.Gift) bool {
-	rows, err := db.Query("SELECT id FROM gifts WHERE wish = ? AND user = ? AND link = ?", gift.Wish.ID, gift.User.ID, gift.Link)
+	rows, err := db.Query("SELECT id FROM gifts WHERE wish = ? AND user = ?", gift.Wish.ID, gift.User.ID)
 	if err != nil {
 		err = rows.Close()
 		return false

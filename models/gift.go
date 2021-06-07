@@ -4,6 +4,6 @@ type Gift struct {
 	ID           int    `json:"id,omitempty"`
 	Wish         Wish   `json:"wish,omitempty"`
 	User         User   `json:"user,omitempty"`
-	Link         string `json:"link, omtempty"`
+	Link         string `json:"link,omitempty"`
 	CreationTime string `json:"creation_time,omitempty"`
 }
