@@ -76,7 +76,7 @@ func main() {
 	wishAPI.PATCH("/:id/comment", isAuthorized(comments.Update))
 	wishAPI.DELETE("/:id/comment", isAuthorized(comments.Delete))
 	wishAPI.GET("/:id/comment", isAuthorized(comments.GetComment))
-	wishAPI.POST("/gift/:id", isAuthorized(feedback.ToggleGift))
+	wishAPI.POST("/gift/:user/:wish", isAuthorized(feedback.ToggleGift))
 	wishAPI.GET("/gifts/:id", isAuthorized(feedback.GetGifts))
 	userAPI := router.Group("/user")
 	userAPI.GET("/", isAuthorized(auth.User))
