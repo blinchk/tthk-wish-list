@@ -62,7 +62,7 @@ func ToggleGift(c *gin.Context) {
 	return
 }
 
-func GetGifts(c *gin.Context) {
+func GetGiftsByUser(c *gin.Context) {
 	var gifts []models.Gift
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -75,6 +75,22 @@ func GetGifts(c *gin.Context) {
 		return
 	}
 	err, gifts = database.GetGiftsByUsers(id, currentUser)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true, "gifts": gifts})
+	return
+}
+
+func GetGifts(c *gin.Context) {
+	var gifts []models.Gift
+	err, currentUser := database.UserData(c.GetHeader("Token"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid token."})
+		return
+	}
+	err, gifts = database.GetGifts(currentUser)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return

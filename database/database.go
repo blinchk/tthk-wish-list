@@ -515,6 +515,32 @@ func GetGiftsByUsers(id int, currentUser models.User) (error, []models.Gift) {
 	return err, gifts
 }
 
+func GetGifts(currentUser models.User) (error, []models.Gift) {
+	var gifts []models.Gift
+	var gift models.Gift
+	rows, err := db.Query("SELECT * FROM gifts")
+	for rows.Next() {
+		rows.Scan(&gift.ID, &gift.Wish.ID, &gift.User.ID, &gift.Link, &gift.CreationTime)
+		err, gift.Wish = GetWishByIdAndUser(gift.Wish.ID, currentUser)
+		if err != nil {
+			err = rows.Close()
+			return err, gifts
+		}
+		err, gift.User = UserDataById(gift.User.ID)
+		if err != nil {
+			err = rows.Close()
+			return err, gifts
+		}
+		gifts = append(gifts, gift)
+	}
+	if err != nil {
+		err = rows.Close()
+		return err, gifts
+	}
+	err = rows.Close()
+	return err, gifts
+}
+
 func GiftExistByWish(wish models.Wish) bool {
 	rows, err := db.Query("SELECT id FROM gifts WHERE wish = ?", wish.ID)
 	if err != nil {
