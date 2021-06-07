@@ -211,10 +211,10 @@ func GetWishes(user models.User, currentUser models.User) (error, []models.Wish)
 		like := models.Like{
 			Connection:     wish.ID,
 			ConnectionType: "wishes",
-			User:           user,
+			User:           currentUser,
 		}
 		err, count = GetLikesCount(like)
-		if LikeExist(like) && currentUser.ID == like.User.ID {
+		if LikeExist(like) {
 			liked = true
 		} else {
 			liked = false
