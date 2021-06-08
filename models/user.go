@@ -9,3 +9,10 @@ type User struct {
 	AccessToken      string `json:"access_token,omitempty"`
 	RegistrationTime string `json:"registration_time,omitempty"`
 }
+
+func (user *User) DeleteSensitiveData() {
+	user.Email = ""
+	user.AccessToken = ""
+	user.Password = ""
+	user.RegistrationTime = ""
+}

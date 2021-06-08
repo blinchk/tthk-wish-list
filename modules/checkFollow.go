@@ -10,7 +10,7 @@ func CheckIsFollowed(requestingUser models.User, id int) (bool, bool) {
 	if requestingUser.ID != id {
 		follows := database.GetFollowsFromUser(requestingUser)
 		for _, follow := range follows {
-			if int(follow.UserTo) == id {
+			if follow.UserTo == id {
 				following = true
 				isSameUser = false
 				return following, isSameUser

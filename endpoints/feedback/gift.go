@@ -13,14 +13,9 @@ func ToggleGift(c *gin.Context) {
 	var gift models.Gift
 	var err error
 	var message gin.H
-	user, err := strconv.Atoi(c.Param("user"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Bad ID of user."})
-		return
-	}
 	wish, err := strconv.Atoi(c.Param("wish"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Bad ID of user."})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Bad ID of wish."})
 		return
 	}
 	err = c.BindJSON(&gift)
@@ -31,11 +26,6 @@ func ToggleGift(c *gin.Context) {
 	err, currentUser := database.UserData(c.GetHeader("Token"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid token."})
-		return
-	}
-	err, gift.User = database.UserDataById(user)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 	err, gift.Wish = database.GetWishByIdAndUser(wish, currentUser)
@@ -51,7 +41,10 @@ func ToggleGift(c *gin.Context) {
 		}
 		message = gin.H{"success": true}
 	} else {
+		gift.User = currentUser
+		gift.Wish.ID = wish
 		err, gift = database.AddGift(gift)
+		gift.User.Email = ""
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 			return
@@ -97,4 +90,33 @@ func GetGifts(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"success": true, "gifts": gifts})
 	return
+}
+
+func EditGift(c *gin.Context) {
+	var gift models.Gift
+	var err error
+	var currentUser models.User
+	var currentGift models.Gift
+	err = c.BindJSON(&gift)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid gift handled."})
+	}
+	err, currentUser = database.UserData(c.GetHeader("Token"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid token."})
+		return
+	}
+	gift.User = currentUser
+	err, currentGift = database.GetGift(gift)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Gift does not exist."})
+		return
+	}
+	if currentGift.User.ID != currentUser.ID {
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"success": false, "error": "Not allowed for you."})
+		return
+	} else {
+		err, gift = database.EditGift(gift)
+		c.JSON(http.StatusOK, gin.H{"success": true, "gift": gift})
+	}
 }

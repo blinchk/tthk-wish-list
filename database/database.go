@@ -54,8 +54,7 @@ func RegisterUser(user models.User) error {
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec("INSERT INTO users(email, first_name, last_name, hash_password, access_token, registration_time) "+
-		"VALUES (?, ?, ?, ?, ?, ?)",
+	_, err = db.Exec("INSERT INTO users(email, first_name, last_name, hash_password, access_token, registration_time) VALUES (?, ?, ?, ?, ?, ?)",
 		user.Email, user.FirstName, user.LastName, hash, user.AccessToken, user.RegistrationTime)
 	if err != nil {
 		return err
@@ -397,25 +396,6 @@ func GetLikesCount(like models.Like) (error, int) {
 	return err, count
 }
 
-func UniteLike(like models.Like, liked bool) error {
-	var likes int
-	rows, err := db.Query("SELECT COUNT(id) FROM likes WHERE connection = ? AND connection_type = ?", like.Connection, like.ConnectionType)
-	if err != nil {
-		err = rows.Close()
-		return err
-	}
-	for rows.Next() {
-		rows.Scan(&likes)
-	}
-	_, err = db.Exec("UPDATE "+like.ConnectionType+" SET liked = ?, likes = ? WHERE id = ?", liked, likes, like.Connection)
-	if err != nil {
-		err = rows.Close()
-		return err
-	}
-	err = rows.Close()
-	return err
-}
-
 func AddLike(like models.Like) (error, models.Like) {
 	rows, err := db.Query("INSERT INTO likes(connection, connection_type, user, creation_time) VALUES(?, ?, ?, ?)", like.Connection, like.ConnectionType, like.User.ID, like.CreationTime)
 	if err != nil {
@@ -485,6 +465,14 @@ func GetGiftId(gift models.Gift) int {
 	}
 	err = rows.Close()
 	return 0
+}
+
+func GetGift(gift models.Gift) (error, models.Gift) {
+	err := db.QueryRow("SELECT wish, user, title, link, creation_time FROM gifts WHERE id = ?", gift.ID).Scan(&gift.Wish.ID, &gift.User.ID, &gift.Title, &gift.Link, &gift.CreationTime)
+	if err != nil {
+		return err, gift
+	}
+	return err, gift
 }
 
 func GetGiftsByUsers(id int, currentUser models.User) (error, []models.Gift) {
@@ -558,7 +546,9 @@ func GiftExistByWish(wish models.Wish) bool {
 func GiftExist(gift models.Gift) bool {
 	rows, err := db.Query("SELECT id FROM gifts WHERE wish = ? AND user = ?", gift.Wish.ID, gift.User.ID)
 	if err != nil {
-		err = rows.Close()
+		if rows != nil {
+			err = rows.Close()
+		}
 		return false
 	}
 	for rows.Next() {
@@ -570,9 +560,23 @@ func GiftExist(gift models.Gift) bool {
 }
 
 func AddGift(gift models.Gift) (error, models.Gift) {
-	rows, err := db.Query("INSERT INTO gifts(wish, user, link) VALUES(?, ?, ?)", gift.Wish.ID, gift.User.ID, gift.Link)
+	rows, err := db.Query("INSERT INTO gifts(wish, user, title, link) VALUES(?, ?, ?, ?)", gift.Wish.ID, gift.User.ID, gift.Title, gift.Link)
 	if err != nil {
-		err = rows.Close()
+		if rows != nil {
+			err = rows.Close()
+		}
+		return err, gift
+	}
+	err = rows.Close()
+	return err, gift
+}
+
+func EditGift(gift models.Gift) (error, models.Gift) {
+	rows, err := db.Query("UPDATE gifts SET title = ?, link = ? WHERE id = ?", gift.Title, gift.Link, gift.ID)
+	if err != nil {
+		if rows != nil {
+			err = rows.Close()
+		}
 		return err, gift
 	}
 	err = rows.Close()
@@ -582,7 +586,9 @@ func AddGift(gift models.Gift) (error, models.Gift) {
 func DeleteGift(gift models.Gift) error {
 	rows, err := db.Query("DELETE FROM gifts WHERE id = ?", GetGiftId(gift))
 	if err != nil {
-		err = rows.Close()
+		if rows != nil {
+			err = rows.Close()
+		}
 		return err
 	}
 	err = rows.Close()
