@@ -453,7 +453,7 @@ func DeleteComment(comment models.Comment) error {
 
 func GetGiftId(gift models.Gift) int {
 	var id int
-	rows, err := db.Query("SELECT id FROM gifts WHERE wish = ? AND user = ? AND link = ?", gift.Wish.ID, gift.User.ID, gift.Link)
+	rows, err := db.Query("SELECT id FROM gifts WHERE wish = ? AND user = ?", gift.Wish.ID, gift.User.ID)
 	if err != nil {
 		err = rows.Close()
 		return 0

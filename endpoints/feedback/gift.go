@@ -18,11 +18,6 @@ func ToggleGift(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Bad ID of wish."})
 		return
 	}
-	err = c.BindJSON(&gift)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Request body is invalid."})
-		return
-	}
 	err, currentUser := database.UserData(c.GetHeader("Token"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid token."})
@@ -33,6 +28,8 @@ func ToggleGift(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
+	gift.User = currentUser
+	gift.Wish.ID = wish
 	if database.GiftExist(gift) {
 		err = database.DeleteGift(gift)
 		if err != nil {
@@ -41,8 +38,11 @@ func ToggleGift(c *gin.Context) {
 		}
 		message = gin.H{"success": true}
 	} else {
-		gift.User = currentUser
-		gift.Wish.ID = wish
+		err = c.BindJSON(&gift)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Request body is invalid."})
+			return
+		}
 		err, gift = database.AddGift(gift)
 		gift.User.Email = ""
 		if err != nil {
