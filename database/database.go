@@ -480,7 +480,7 @@ func GetGiftsByUsers(id int, currentUser models.User) (error, []models.Gift) {
 	var gift models.Gift
 	rows, err := db.Query("SELECT * FROM gifts")
 	for rows.Next() {
-		rows.Scan(&gift.ID, &gift.Wish.ID, &gift.User.ID, &gift.Link, &gift.CreationTime)
+		rows.Scan(&gift.ID, &gift.Wish.ID, &gift.User.ID, &gift.Title, &gift.Link, &gift.CreationTime)
 		err, gift.Wish = GetWishByIdAndUser(gift.Wish.ID, currentUser)
 		if err != nil {
 			err = rows.Close()
@@ -508,7 +508,7 @@ func GetGifts(currentUser models.User) (error, []models.Gift) {
 	var gift models.Gift
 	rows, err := db.Query("SELECT * FROM gifts")
 	for rows.Next() {
-		rows.Scan(&gift.ID, &gift.Wish.ID, &gift.User.ID, &gift.Link, &gift.CreationTime)
+		rows.Scan(&gift.ID, &gift.Wish.ID, &gift.User.ID, &gift.Title, &gift.Link, &gift.CreationTime)
 		err, gift.Wish = GetWishByIdAndUser(gift.Wish.ID, currentUser)
 		if err != nil {
 			err = rows.Close()
