@@ -92,6 +92,23 @@ func GetGifts(c *gin.Context) {
 	return
 }
 
+func GetGiftByWish(c *gin.Context) {
+	var gift models.Gift
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Bad ID of user."})
+		return
+	}
+	gift.Wish.ID = id
+	err, gift = database.GetGiftByWish(gift.Wish)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true, "gift": gift})
+	return
+}
+
 func EditGift(c *gin.Context) {
 	var gift models.Gift
 	var err error

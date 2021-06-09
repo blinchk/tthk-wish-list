@@ -22,6 +22,7 @@ func AddWishEndpoints(router *gin.Engine) {
 	wishAPI.DELETE("/:id/comment", isAuthorized(comments.Delete))
 	wishAPI.GET("/:id/comment", isAuthorized(comments.GetComment))
 	wishAPI.POST("/gift/:wish", isAuthorized(feedback.ToggleGift))
+	wishAPI.GET("/:id/gift", isAuthorized(feedback.GetGiftByWish))
 	wishAPI.GET("/gift/:id", isAuthorized(feedback.GetGiftsByUser))
 	wishAPI.PATCH("/gift/", isAuthorized(feedback.EditGift))
 	wishAPI.GET("/gifts", isAuthorized(feedback.GetGifts))

@@ -475,6 +475,16 @@ func GetGift(gift models.Gift) (error, models.Gift) {
 	return err, gift
 }
 
+func GetGiftByWish(wish models.Wish) (error, models.Gift) {
+	var gift models.Gift
+	err := db.QueryRow("SELECT id, user, title, link, creation_time FROM gifts WHERE wish = ?", wish.ID).Scan(&gift.ID, &gift.User.ID, &gift.Title, &gift.Link, &gift.CreationTime)
+	gift.Wish.ID = wish.ID
+	if err != nil {
+		return err, gift
+	}
+	return err, gift
+}
+
 func GetGiftsByUsers(id int, currentUser models.User) (error, []models.Gift) {
 	var gifts []models.Gift
 	var gift models.Gift
