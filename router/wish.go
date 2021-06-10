@@ -26,4 +26,5 @@ func AddWishEndpoints(router *gin.Engine) {
 	wishAPI.GET("/gift/:id", isAuthorized(feedback.GetGiftsByUser))
 	wishAPI.PATCH("/gift/", isAuthorized(feedback.EditGift))
 	wishAPI.GET("/gifts", isAuthorized(feedback.GetGifts))
+	wishAPI.POST("/gift/:wish/book", isAuthorized(feedback.ToogleBookingByWish))
 }

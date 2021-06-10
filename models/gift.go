@@ -6,5 +6,7 @@ type Gift struct {
 	User         User   `json:"user"`
 	Title        string `json:"title,omitempty"`
 	Link         string `json:"link,omitempty"`
+	Booked       bool   `json:"booked,omitempty"`
+	UserBooked   User   `json:"user_booked"`
 	CreationTime string `json:"creation_time,omitempty"`
 }

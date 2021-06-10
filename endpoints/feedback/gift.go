@@ -9,6 +9,28 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func ToogleBookingByWish(c *gin.Context) {
+	var gift models.Gift
+	id, err := strconv.Atoi(c.Param("wish"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Bad ID of wish."})
+		return
+	}
+	gift.Wish.ID = id
+	err, currentUser := database.UserData(c.GetHeader("Token"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid token."})
+		return
+	}
+	err = database.ToggleBooking(gift, currentUser)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true})
+	return
+}
+
 func ToggleGift(c *gin.Context) {
 	var gift models.Gift
 	var err error
@@ -96,11 +118,16 @@ func GetGiftByWish(c *gin.Context) {
 	var gift models.Gift
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Bad ID of user."})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Bad ID of wish."})
 		return
 	}
 	gift.Wish.ID = id
-	err, gift = database.GetGiftByWish(gift.Wish)
+	err, currentUser := database.UserData(c.GetHeader("Token"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid token."})
+		return
+	}
+	err, gift = database.GetGiftByWish(gift.Wish, currentUser)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
@@ -124,7 +151,7 @@ func EditGift(c *gin.Context) {
 		return
 	}
 	gift.User = currentUser
-	err, currentGift = database.GetGift(gift)
+	err, currentGift = database.GetGift(gift, currentUser)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Gift does not exist."})
 		return

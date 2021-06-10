@@ -197,6 +197,7 @@ func GetWishByIdAndUser(id int, currentUser models.User) (error, models.Wish) {
 	var user models.User
 	var liked bool
 	var gifted bool
+	var booked bool
 	if err != nil {
 		return err, wish
 	}
@@ -226,12 +227,18 @@ func GetWishByIdAndUser(id int, currentUser models.User) (error, models.Wish) {
 		} else {
 			gifted = false
 		}
+		if GiftBookedByWish(wish) {
+			booked = true
+		} else {
+			booked = false
+		}
 		if err != nil {
 			return err, wish
 		}
 		wish.Likes = count
 		wish.Liked = liked
 		wish.Gifted = gifted
+		wish.Booked = booked
 		if err != nil {
 			return err, wish
 		}
@@ -245,6 +252,7 @@ func GetWishes(user models.User, currentUser models.User) (error, []models.Wish)
 	var wish models.Wish
 	var liked bool
 	var gifted bool
+	var booked bool
 	if err != nil {
 		return err, wishes
 	}
@@ -272,12 +280,18 @@ func GetWishes(user models.User, currentUser models.User) (error, []models.Wish)
 		} else {
 			gifted = false
 		}
+		if GiftBookedByWish(wish) {
+			booked = true
+		} else {
+			booked = false
+		}
 		if err != nil {
 			return err, wishes
 		}
 		wish.Likes = count
 		wish.Liked = liked
 		wish.Gifted = gifted
+		wish.Booked = booked
 		if err != nil {
 			return err, wishes
 		}
@@ -467,21 +481,69 @@ func GetGiftId(gift models.Gift) int {
 	return 0
 }
 
-func GetGift(gift models.Gift) (error, models.Gift) {
-	err := db.QueryRow("SELECT wish, user, title, link, creation_time FROM gifts WHERE id = ?", gift.ID).Scan(&gift.Wish.ID, &gift.User.ID, &gift.Title, &gift.Link, &gift.CreationTime)
+func GiftBookedByWish(wish models.Wish) bool {
+	rows, err := db.Query("SELECT id FROM gifts WHERE wish = ? AND booked = true", wish.ID)
 	if err != nil {
+		err = rows.Close()
+		return false
+	}
+	for rows.Next() {
+		err = rows.Close()
+		return true
+	}
+	err = rows.Close()
+	return false
+}
+
+func GetGift(gift models.Gift, currentUser models.User) (error, models.Gift) {
+	rows, err := db.Query("SELECT * FROM gifts WHERE id = ?", gift.ID)
+	for rows.Next() {
+		rows.Scan(&gift.ID, &gift.Wish.ID, &gift.User.ID, &gift.Title, &gift.Link, &gift.Booked, &gift.UserBooked, &gift.CreationTime)
+		err, gift.Wish = GetWishByIdAndUser(gift.Wish.ID, currentUser)
+		if err != nil {
+			err = rows.Close()
+			return err, gift
+		}
+		err, gift.User = UserDataById(gift.User.ID)
+		if err != nil {
+			err = rows.Close()
+			return err, gift
+		}
+	}
+	if err != nil {
+		err = rows.Close()
 		return err, gift
 	}
+	err = rows.Close()
 	return err, gift
 }
 
-func GetGiftByWish(wish models.Wish) (error, models.Gift) {
+func GetGiftByWish(wish models.Wish, currentUser models.User) (error, models.Gift) {
 	var gift models.Gift
-	err := db.QueryRow("SELECT id, user, title, link, creation_time FROM gifts WHERE wish = ?", wish.ID).Scan(&gift.ID, &gift.User.ID, &gift.Title, &gift.Link, &gift.CreationTime)
-	gift.Wish.ID = wish.ID
+	rows, err := db.Query("SELECT * FROM gifts WHERE wish = ?", wish.ID)
+	for rows.Next() {
+		rows.Scan(&gift.ID, &gift.Wish.ID, &gift.User.ID, &gift.Title, &gift.Link, &gift.Booked, &gift.UserBooked, &gift.CreationTime)
+		err, gift.Wish = GetWishByIdAndUser(gift.Wish.ID, currentUser)
+		if err != nil {
+			err = rows.Close()
+			return err, gift
+		}
+		err, gift.User = UserDataById(gift.User.ID)
+		if err != nil {
+			err = rows.Close()
+			return err, gift
+		}
+		err, gift.UserBooked = GetUserBookedByWish(gift.Wish)
+		if err != nil {
+			err = rows.Close()
+			return err, gift
+		}
+	}
 	if err != nil {
+		err = rows.Close()
 		return err, gift
 	}
+	err = rows.Close()
 	return err, gift
 }
 
@@ -490,13 +552,18 @@ func GetGiftsByUsers(id int, currentUser models.User) (error, []models.Gift) {
 	var gift models.Gift
 	rows, err := db.Query("SELECT * FROM gifts")
 	for rows.Next() {
-		rows.Scan(&gift.ID, &gift.Wish.ID, &gift.User.ID, &gift.Title, &gift.Link, &gift.CreationTime)
+		rows.Scan(&gift.ID, &gift.Wish.ID, &gift.User.ID, &gift.Title, &gift.Link, &gift.Booked, &gift.UserBooked, &gift.CreationTime)
 		err, gift.Wish = GetWishByIdAndUser(gift.Wish.ID, currentUser)
 		if err != nil {
 			err = rows.Close()
 			return err, gifts
 		}
 		err, gift.User = UserDataById(gift.User.ID)
+		if err != nil {
+			err = rows.Close()
+			return err, gifts
+		}
+		err, gift.UserBooked = GetUserBookedByWish(gift.Wish)
 		if err != nil {
 			err = rows.Close()
 			return err, gifts
@@ -518,13 +585,18 @@ func GetGifts(currentUser models.User) (error, []models.Gift) {
 	var gift models.Gift
 	rows, err := db.Query("SELECT * FROM gifts")
 	for rows.Next() {
-		rows.Scan(&gift.ID, &gift.Wish.ID, &gift.User.ID, &gift.Title, &gift.Link, &gift.CreationTime)
+		rows.Scan(&gift.ID, &gift.Wish.ID, &gift.User.ID, &gift.Title, &gift.Link, &gift.Booked, &gift.UserBooked, &gift.CreationTime)
 		err, gift.Wish = GetWishByIdAndUser(gift.Wish.ID, currentUser)
 		if err != nil {
 			err = rows.Close()
 			return err, gifts
 		}
 		err, gift.User = UserDataById(gift.User.ID)
+		if err != nil {
+			err = rows.Close()
+			return err, gifts
+		}
+		err, gift.UserBooked = GetUserBookedByWish(gift.Wish)
 		if err != nil {
 			err = rows.Close()
 			return err, gifts
@@ -537,6 +609,19 @@ func GetGifts(currentUser models.User) (error, []models.Gift) {
 	}
 	err = rows.Close()
 	return err, gifts
+}
+
+func GetUserBookedByWish(wish models.Wish) (error, models.User) {
+	var user models.User
+	err := db.QueryRow("SELECT user_booked FROM gifts WHERE wish = ?", wish.ID).Scan(&user.ID)
+	if err != nil {
+		return err, user
+	}
+	err, user = UserDataById(user.ID)
+	if err != nil {
+		return err, user
+	}
+	return err, user
 }
 
 func GiftExistByWish(wish models.Wish) bool {
@@ -603,4 +688,32 @@ func DeleteGift(gift models.Gift) error {
 	}
 	err = rows.Close()
 	return err
+}
+
+func ToggleBooking(gift models.Gift, currentUser models.User) error {
+	err := db.QueryRow("SELECT booked FROM gifts WHERE wish = ?", gift.Wish.ID).Scan(&gift.Booked)
+	if err != nil {
+		return err
+	}
+	if gift.Booked {
+		rows, err := db.Query("UPDATE gifts SET booked = !booked, user_booked = 0 WHERE wish = ?", gift.Wish.ID)
+		if err != nil {
+			if rows != nil {
+				err = rows.Close()
+			}
+			return err
+		}
+		err = rows.Close()
+		return err
+	} else {
+		rows, err := db.Query("UPDATE gifts SET booked = !booked, user_booked = ? WHERE wish = ?", currentUser.ID, gift.Wish.ID)
+		if err != nil {
+			if rows != nil {
+				err = rows.Close()
+			}
+			return err
+		}
+		err = rows.Close()
+		return err
+	}
 }

@@ -9,5 +9,6 @@ type Wish struct {
 	Liked        bool   `json:"liked,omitempty"`
 	Likes        int    `json:"likes,omitempty"`
 	Gifted       bool   `json:"gifted,omitempty"`
+	Booked       bool   `json:"booked,omitempty"`
 	CreationTime string `json:"creationTime,omitempty"`
 }
