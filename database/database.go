@@ -690,10 +690,11 @@ func DeleteGift(gift models.Gift) error {
 	return err
 }
 
-func ToggleBooking(gift models.Gift, currentUser models.User) error {
+func ToggleBooking(gift models.Gift, currentUser models.User) (bool, error) {
 	err := db.QueryRow("SELECT booked FROM gifts WHERE wish = ?", gift.Wish.ID).Scan(&gift.Booked)
+	booked := false
 	if err != nil {
-		return err
+		return booked, err
 	}
 	if gift.Booked {
 		rows, err := db.Query("UPDATE gifts SET booked = !booked, user_booked = 0 WHERE wish = ?", gift.Wish.ID)
@@ -701,19 +702,20 @@ func ToggleBooking(gift models.Gift, currentUser models.User) error {
 			if rows != nil {
 				err = rows.Close()
 			}
-			return err
+			return booked, err
 		}
 		err = rows.Close()
-		return err
+		return booked, err
 	} else {
 		rows, err := db.Query("UPDATE gifts SET booked = !booked, user_booked = ? WHERE wish = ?", currentUser.ID, gift.Wish.ID)
 		if err != nil {
 			if rows != nil {
 				err = rows.Close()
 			}
-			return err
+			return booked, err
 		}
+		booked = true
 		err = rows.Close()
-		return err
+		return booked, err
 	}
 }
